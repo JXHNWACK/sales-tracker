@@ -191,6 +191,21 @@
             transform: scale(0.95);
         }
         
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: #e2e8f0;
+            border-radius: 999px;
+            margin-top: 0.75rem;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #059669;
+            border-radius: 999px;
+            width: 0%;
+            transition: width 0.5s ease-out, background-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -269,14 +284,14 @@
         <div class="results-section">
             <h3 style="text-align: center; margin-top: 0; margin-bottom: 1rem; color: var(--text-main);">Required vs Current Run Rate</h3>
             <div class="grid-container">
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-POINTS"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-CV"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-HBB"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-MBB"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-RET"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-B2B"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-PAYG"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-ACCESSORIES"></div></div></div>
             </div>
         </div>
     </div>
@@ -328,6 +343,7 @@
                     const mtdInput = document.querySelector(`.kpi-mtd[data-kpi="${kpiName}"]`);
                     const resDisplay = document.getElementById(`res-${kpiName}`);
                     const rrDisplay = document.getElementById(`rr-${kpiName}`);
+                    const progDisplay = document.getElementById(`prog-${kpiName}`);
                     
                     const target = parseFloat(targetInput.value);
                     const mtd = parseFloat(mtdInput.value) || 0;
@@ -380,6 +396,18 @@
                         rrDisplay.classList.remove('animate-pop');
                         void rrDisplay.offsetWidth; // Trigger DOM reflow to restart animation
                         rrDisplay.classList.add('animate-pop');
+                    }
+
+                    // Update progress bar
+                    if (progDisplay) {
+                        let progressPercent = 0;
+                        if (!isNaN(target) && target > 0 && !isNaN(mtd)) {
+                            progressPercent = (mtd / target) * 100;
+                            // Cap visual width at 100% so it doesn't overflow the container
+                            if (progressPercent > 100) progressPercent = 100;
+                        }
+                        progDisplay.style.width = `${progressPercent}%`;
+                        progDisplay.style.backgroundColor = newRrColor; // Match the bar color to the run-rate status (Red/Green)
                     }
                 });
 
