@@ -384,9 +384,16 @@
                             saveBtn.style.backgroundColor = '#10b981';
                         }, 2000);
                     } else {
-                        // Get the exact error message from the server
-                        const errData = await res.json().catch(() => ({}));
-                        throw new Error(errData.error || "Server rejected the save request");
+                        // Get the raw HTTP Status and exact text from Railway
+                        const text = await res.text();
+                        let errorMessage = `HTTP Error ${res.status}: `;
+                        try {
+                            const errData = JSON.parse(text);
+                            errorMessage += errData.error || "Server rejected the save request";
+                        } catch(e) {
+                            errorMessage += text ? text.substring(0, 150) : "Server rejected the save request (No response body)";
+                        }
+                        throw new Error(errorMessage);
                     }
                 }).catch(err => {
                     console.error("Failed to save data:", err);

@@ -9,23 +9,26 @@ const PORT = process.env.PORT || 3000;
 let dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data');
 let dataFile;
 
+const setupDataDir = (dir) => {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, '.test-write'), 'ok');
+    return path.join(dir, 'data.json');
+};
+
 try {
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
+    dataFile = setupDataDir(dataDir);
+} catch (err1) {
+    console.error("Primary path not writable:", err1.message);
+    try {
+        dataFile = setupDataDir(path.join(__dirname, 'data'));
+    } catch (err2) {
+        console.error("Fallback path not writable:", err2.message);
+        // Ultimate fallback: /tmp is guaranteed to be writable in Linux containers
+        dataFile = setupDataDir('/tmp/data');
     }
-    dataFile = path.join(dataDir, 'data.json');
-    // Self-test: Ensure we actually have permission to write to this folder
-    fs.writeFileSync(path.join(dataDir, '.test-write'), 'ok');
-} catch (err) {
-    console.error("Volume path is not writable! Falling back to local directory.", err.message);
-    dataDir = path.join(__dirname, 'data');
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
-    }
-    dataFile = path.join(dataDir, 'data.json');
 }
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(__dirname)); // Serves index.html automatically
 
 // Health check endpoint for Railway
