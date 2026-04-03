@@ -16,6 +16,11 @@ app.use(express.json());
 app.use(express.static(__dirname)); // Serves index.html automatically
 
 app.get('/api/data', (req, res) => {
+    // Force browsers not to cache this response
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    res.setHeader('Expires', '-1');
+    res.setHeader('Pragma', 'no-cache');
+
     try {
         if (fs.existsSync(dataFile)) {
             const fileContent = fs.readFileSync(dataFile, 'utf8');
