@@ -5,8 +5,8 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Force use of the local data folder to exactly match the Railway Volume mount
-const dataDir = path.join(__dirname, 'data');
+// Use Railway's official Volume environment variable to guarantee the save path is correct
+const dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
 }
