@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KPI Shift Calculator</title>
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popNumber {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        .animate-pop {
+            animation: popNumber 0.3s ease-out;
+        }
+
+        .calculator-card {
+            background-color: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            width: 100%;
+            max-width: 800px;
+            animation: slideUpFade 0.6s ease-out forwards;
+        }
+
+        .header-container {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .store-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            color: var(--primary-color);
+            padding: 0.35rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.025em;
+        }
+
+        .input-group {
+            margin-bottom: 0.75rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.25rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 16px; /* Increased for mobile zoom prevention */
+            font-family: inherit;
+            height: 40px;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+            background-color: #f8fafc;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15), 0 0 12px rgba(79, 70, 229, 0.3);
+            background-color: #ffffff;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid-container {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.75rem;
+            }
+        }
+
+        .grid-container > .input-group {
+            background-color: #f8fafc;
+            padding: 0.75rem;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.02);
+        }
+
+        .results-section {
+            margin-top: 1.5rem;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 1rem;
+        }
+
+        .result-box {
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #e2e8f0;
+            border-top: 4px solid var(--primary-color);
+            padding: 0.75rem 0.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .result-box:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        .result-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 0.15rem 0;
+            display: inline-block;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .btn-reset {
+            background-color: #fee2e2;
+            color: #ef4444;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+        }
+        .btn-reset:hover {
+            background-color: #fca5a5;
+        }
+        .btn-reset:active {
+            transform: scale(0.95);
+        }
+        
+    </style>
+</head>
+<body>
+
+    <div class="calculator-card">
+        <div class="header-container">
+            <div class="store-badge">📍 Leicester Gallowtree Gate</div>
+            <h2>KPI Target Calculator</h2>
+            <button id="resetBtn" class="btn-reset">↻ Reset All Numbers</button>
+        </div>
+        
+        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                <label for="daysPassed">Days Passed</label>
+                <input type="number" id="daysPassed" placeholder="e.g., 15" min="1" step="1">
+            </div>
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                <label for="monthSelect">Month</label>
+                <select id="monthSelect">
+                    <option value="1">Jan</option>
+                    <option value="2">Feb</option>
+                    <option value="3">Mar</option>
+                    <option value="4">Apr</option>
+                    <option value="5">May</option>
+                    <option value="6">Jun</option>
+                    <option value="7">Jul</option>
+                    <option value="8">Aug</option>
+                    <option value="9">Sep</option>
+                    <option value="10">Oct</option>
+                    <option value="11">Nov</option>
+                    <option value="12">Dec</option>
+                </select>
+            </div>
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+                <label for="shiftsInput">Remaining Shifts</label>
+                <input type="number" id="shiftsInput" placeholder="e.g., 10" min="1" step="1">
+            </div>
+        </div>
+
+        <!-- The style updates above automatically apply to these grid items -->
+        <div class="grid-container">
+            <div class="input-group">
+                <label>🎯 POINTS</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>📄 CV</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>🏠 HBB</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>📱 MBB</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>🔄 RET</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>💼 B2B</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>💳 PAYG</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any"></div>
+            </div>
+            <div class="input-group">
+                <label>🎧 ACC</label>
+                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any"></div>
+            </div>
+        </div>
+
+        <div class="results-section">
+            <h3 style="text-align: center; margin-top: 0; margin-bottom: 1rem; color: var(--text-main);">Required vs Current Run Rate</h3>
+            <div class="grid-container">
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const shiftsInput = document.getElementById('shiftsInput');
+            const daysPassedInput = document.getElementById('daysPassed');
+            const monthSelect = document.getElementById('monthSelect');
+            const kpiTargets = document.querySelectorAll('.kpi-target');
+            const kpiMtds = document.querySelectorAll('.kpi-mtd');
+
+            // Auto-select the current month on load
+            monthSelect.value = new Date().getMonth() + 1;
+
+            // Load saved data from the device's Local Storage
+            const savedData = localStorage.getItem('leicesterKpiData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                if (data.daysPassed) daysPassedInput.value = data.daysPassed;
+                if (data.monthSelect) monthSelect.value = data.monthSelect;
+                if (data.shiftsInput) shiftsInput.value = data.shiftsInput;
+                
+                kpiTargets.forEach(input => {
+                    const kpi = input.getAttribute('data-kpi');
+                    if (data[`target_${kpi}`] !== undefined) input.value = data[`target_${kpi}`];
+                });
+                kpiMtds.forEach(input => {
+                    const kpi = input.getAttribute('data-kpi');
+                    if (data[`mtd_${kpi}`] !== undefined) input.value = data[`mtd_${kpi}`];
+                });
+            }
+
+            function calculateTargets() {
+                const remaining = parseInt(shiftsInput.value, 10);
+                const daysPassed = parseInt(daysPassedInput.value, 10);
+                const currentYear = new Date().getFullYear();
+                const daysInMonth = new Date(currentYear, parseInt(monthSelect.value, 10), 0).getDate();
+
+                // Save all current inputs to the device's Local Storage
+                const dataToSave = {
+                    daysPassed: daysPassedInput.value,
+                    monthSelect: monthSelect.value,
+                    shiftsInput: shiftsInput.value
+                };
+
+                kpiTargets.forEach(targetInput => {
+                    const kpiName = targetInput.getAttribute('data-kpi');
+                    const mtdInput = document.querySelector(`.kpi-mtd[data-kpi="${kpiName}"]`);
+                    const resDisplay = document.getElementById(`res-${kpiName}`);
+                    const rrDisplay = document.getElementById(`rr-${kpiName}`);
+                    
+                    const target = parseFloat(targetInput.value);
+                    const mtd = parseFloat(mtdInput.value) || 0;
+
+                    // Add this KPI's data to our save file
+                    dataToSave[`target_${kpiName}`] = targetInput.value;
+                    dataToSave[`mtd_${kpiName}`] = mtdInput.value;
+
+                    // Calculate required per remaining shift
+                    let newResText = '0';
+                    if (!isNaN(target) && !isNaN(remaining) && remaining > 0) {
+                        const remainingToHit = Math.max(0, target - mtd);
+                        newResText = Math.ceil(remainingToHit / remaining).toString();
+                    }
+
+                    if (resDisplay.textContent !== newResText) {
+                        resDisplay.textContent = newResText;
+                        resDisplay.classList.remove('animate-pop');
+                        void resDisplay.offsetWidth; // Trigger DOM reflow to restart animation
+                        resDisplay.classList.add('animate-pop');
+                    }
+
+                    // Calculate actual current run rate percentage
+                    let newRrText = '0.00%';
+                    let newRrColor = '#059669'; // default green
+                    let newRrBg = 'transparent';
+
+                    if (!isNaN(mtd) && !isNaN(daysPassed) && daysPassed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
+                        const projectedTotal = (mtd / daysPassed) * daysInMonth;
+                        const runRatePercent = (projectedTotal / target) * 100;
+                        newRrText = runRatePercent.toFixed(2) + '%';
+                        
+                        if (runRatePercent < 100) {
+                            newRrColor = '#ef4444';
+                            newRrBg = '#fef2f2';
+                        } else {
+                            newRrBg = '#ecfdf5';
+                        }
+                    }
+
+                    rrDisplay.style.borderRadius = '6px';
+                    rrDisplay.style.padding = '0.1rem 0.4rem';
+                    rrDisplay.style.display = 'inline-block';
+
+                    if (rrDisplay.textContent !== newRrText) {
+                        rrDisplay.textContent = newRrText;
+                        rrDisplay.style.color = newRrColor;
+                        rrDisplay.style.backgroundColor = newRrBg;
+                        
+                        rrDisplay.classList.remove('animate-pop');
+                        void rrDisplay.offsetWidth; // Trigger DOM reflow to restart animation
+                        rrDisplay.classList.add('animate-pop');
+                    }
+                });
+
+                // Commit the save file
+                localStorage.setItem('leicesterKpiData', JSON.stringify(dataToSave));
+            }
+
+            shiftsInput.addEventListener('input', calculateTargets);
+            daysPassedInput.addEventListener('input', calculateTargets);
+            monthSelect.addEventListener('change', calculateTargets);
+            kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
+            kpiMtds.forEach(input => input.addEventListener('input', calculateTargets));
+
+            // Logic for the Reset Data Button
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                if(confirm('Are you sure you want to clear all numbers for the new month?')) {
+                    localStorage.removeItem('leicesterKpiData');
+                    shiftsInput.value = '';
+                    daysPassedInput.value = '';
+                    kpiTargets.forEach(input => input.value = '');
+                    kpiMtds.forEach(input => input.value = '');
+                    monthSelect.value = new Date().getMonth() + 1; // reset to current month
+                    calculateTargets();
+                }
+            });
+
+            // Run the calculation immediately on load in case there is saved data
+            calculateTargets();
+        });
+    </script>
+</body>
+</html>
