@@ -383,11 +383,18 @@
                             saveBtn.textContent = '💾 Save';
                             saveBtn.style.backgroundColor = '#10b981';
                         }, 2000);
+                    } else {
+                        // If the server returns a 500 error, force it into the catch block
+                        throw new Error("Server rejected the save request");
                     }
                 }).catch(err => {
                     console.error("Failed to save data:", err);
                     saveBtn.textContent = '❌ Error';
                     saveBtn.style.backgroundColor = '#ef4444';
+                    setTimeout(() => {
+                        saveBtn.textContent = '💾 Save';
+                        saveBtn.style.backgroundColor = '#10b981';
+                    }, 3000);
                 });
             }
             
