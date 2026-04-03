@@ -250,7 +250,8 @@
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
             
-            <div class="input-group" style="max-width: 350px; margin: 1.5rem auto 0 auto; display: flex; gap: 0.5rem; justify-content: center;">
+            <div class="input-group" style="max-width: 400px; margin: 1.5rem auto 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                <img id="advisorImage" src="https://ui-avatars.com/api/?name=Lucy&background=e0e7ff&color=4f46e5&rounded=true" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--primary-color);">
                 <select id="advisorSelect" style="flex: 1; border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
                     <option value="advisor1">👤 Lucy</option>
                     <option value="advisor2">👤 Luiza</option>
@@ -349,6 +350,19 @@
             const kpiTargets = document.querySelectorAll('.kpi-target');
             const kpiMtds = document.querySelectorAll('.kpi-mtd');
             
+            const advisorImage = document.getElementById('advisorImage');
+            
+            // To use custom photos, paste the direct image link (ending in .jpg or .png) between the quotes!
+            const advisorImages = {
+                "advisor1": "https://ui-avatars.com/api/?name=Lucy&background=e0e7ff&color=4f46e5&rounded=true",      // <-- Replace this link for Lucy
+                "advisor2": "https://ui-avatars.com/api/?name=Luiza&background=e0e7ff&color=4f46e5&rounded=true",     // <-- Replace this link for Luiza
+                "advisor3": "https://ui-avatars.com/api/?name=Hamza&background=e0e7ff&color=4f46e5&rounded=true",     // <-- Replace this link for Hamza
+                "advisor4": "https://ui-avatars.com/api/?name=Jibraan&background=e0e7ff&color=4f46e5&rounded=true",   // <-- Replace this link for Jibraan
+                "advisor5": "https://ui-avatars.com/api/?name=Pratiksha&background=e0e7ff&color=4f46e5&rounded=true", // <-- Replace this link for Pratiksha
+                "advisor6": "https://ibb.co/rKthhmTP",    // <-- Replace this link for Hayley
+                "advisor7": "https://ui-avatars.com/api/?name=Amirah&background=e0e7ff&color=4f46e5&rounded=true"     // <-- Replace this link for Amirah
+            };
+
             let allAdvisorsData = {}; // Will hold data for all 7 advisors
             let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
 
@@ -371,6 +385,7 @@
                 } finally {
                     // Initialize the UI only AFTER attempting to fetch cloud data
                     loadAdvisorData(advisorSelect.value);
+                    advisorImage.src = advisorImages[advisorSelect.value]; // Ensure image matches dropdown on load
                 }
             }
             fetchCloudData();
@@ -595,6 +610,7 @@
             }
 
             advisorSelect.addEventListener('change', () => {
+                advisorImage.src = advisorImages[advisorSelect.value];
                 loadAdvisorData(advisorSelect.value);
             });
             monthSelect.addEventListener('change', () => {
