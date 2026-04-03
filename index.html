@@ -247,8 +247,8 @@
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
             
-            <div class="input-group" style="max-width: 250px; margin: 1.5rem auto 0 auto;">
-                <select id="advisorSelect" style="border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
+            <div class="input-group" style="max-width: 350px; margin: 1.5rem auto 0 auto; display: flex; gap: 0.5rem; justify-content: center;">
+                <select id="advisorSelect" style="flex: 1; border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
                     <option value="advisor1">👤 Lucy</option>
                     <option value="advisor2">👤 Luiza</option>
                     <option value="advisor3">👤 Hamza</option>
@@ -257,6 +257,7 @@
                     <option value="advisor6">👤 Hayley</option>
                     <option value="advisor7">👤 Amirah</option>
                 </select>
+                <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s;">💾 Save</button>
             </div>
             
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
@@ -365,34 +366,32 @@
             }
             fetchCloudData();
 
-            // Debounce network requests to prevent overlapping saves and race conditions
-            let saveTimeout;
-            let hasUnsavedChanges = false;
             function saveToCloud() {
-                hasUnsavedChanges = true;
-                clearTimeout(saveTimeout);
-                saveTimeout = setTimeout(() => {
-                    fetch('/api/data', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(allAdvisorsData)
-                    }).then(() => {
-                        hasUnsavedChanges = false;
-                    }).catch(err => console.error("Failed to save data:", err));
-                }, 600);
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.textContent = '⏳ Saving...';
+                saveBtn.style.backgroundColor = '#f59e0b';
+                
+                fetch('/api/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(allAdvisorsData)
+                }).then((res) => {
+                    if (res.ok) {
+                        saveBtn.textContent = '✅ Saved!';
+                        saveBtn.style.backgroundColor = '#059669';
+                        setTimeout(() => {
+                            saveBtn.textContent = '💾 Save';
+                            saveBtn.style.backgroundColor = '#10b981';
+                        }, 2000);
+                    }
+                }).catch(err => {
+                    console.error("Failed to save data:", err);
+                    saveBtn.textContent = '❌ Error';
+                    saveBtn.style.backgroundColor = '#ef4444';
+                });
             }
-
-            // Guarantee save if the user refreshes or closes the page right after typing
-            window.addEventListener('beforeunload', () => {
-                if (hasUnsavedChanges) {
-                    fetch('/api/data', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(allAdvisorsData),
-                        keepalive: true
-                    });
-                }
-            });
+            
+            document.getElementById('saveBtn').addEventListener('click', saveToCloud);
 
             // Function to load a specific advisor's profile into the UI
             function loadAdvisorData(advisorId) {
@@ -566,9 +565,6 @@
 
                 // Update the global data object with this advisor's new numbers
                 allAdvisorsData[currentAdvisor] = advisorData;
-                
-                // Save to the Node.js Server (Railway)
-                saveToCloud();
             }
 
             advisorSelect.addEventListener('change', () => {
