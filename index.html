@@ -206,6 +206,28 @@
             width: 0%;
             transition: width 0.5s ease-out, background-color 0.3s ease;
         }
+        
+        .calendar-day {
+            width: 34px;
+            height: 34px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background-color: white;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+        .calendar-day.selected {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -217,31 +239,24 @@
             <button id="resetBtn" class="btn-reset">↻ Reset All Numbers</button>
         </div>
         
-        <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
-            <div class="input-group" style="flex: 1; margin-bottom: 0;">
-                <label for="daysPassed">Days Passed</label>
-                <input type="number" id="daysPassed" placeholder="e.g., 15" min="1" step="1">
+        <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                <label style="margin: 0; font-size: 0.95rem; font-weight: 700;">📅 Select Scheduled Shifts</label>
+                <div class="input-group" style="margin: 0; width: 110px;">
+                    <select id="monthSelect" style="height: 34px; padding: 0.25rem 0.5rem;">
+                        <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
+                        <option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option>
+                        <option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option>
+                        <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+                    </select>
+                </div>
             </div>
-            <div class="input-group" style="flex: 1; margin-bottom: 0;">
-                <label for="monthSelect">Month</label>
-                <select id="monthSelect">
-                    <option value="1">Jan</option>
-                    <option value="2">Feb</option>
-                    <option value="3">Mar</option>
-                    <option value="4">Apr</option>
-                    <option value="5">May</option>
-                    <option value="6">Jun</option>
-                    <option value="7">Jul</option>
-                    <option value="8">Aug</option>
-                    <option value="9">Sep</option>
-                    <option value="10">Oct</option>
-                    <option value="11">Nov</option>
-                    <option value="12">Dec</option>
-                </select>
+            <div id="calendar-days" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
+                <!-- JS will populate days here -->
             </div>
-            <div class="input-group" style="flex: 1; margin-bottom: 0;">
-                <label for="shiftsInput">Remaining Shifts</label>
-                <input type="number" id="shiftsInput" placeholder="e.g., 10" min="1" step="1">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: white; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
+                <div style="color: var(--text-muted)">Days Passed (MTD): <span id="calcDaysPassed" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
+                <div style="color: var(--text-muted)">Remaining Shifts: <span id="calcRemaining" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
             </div>
         </div>
 
@@ -298,11 +313,11 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const shiftsInput = document.getElementById('shiftsInput');
-            const daysPassedInput = document.getElementById('daysPassed');
             const monthSelect = document.getElementById('monthSelect');
             const kpiTargets = document.querySelectorAll('.kpi-target');
             const kpiMtds = document.querySelectorAll('.kpi-mtd');
+            
+            let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
 
             // Auto-select the current month on load
             monthSelect.value = new Date().getMonth() + 1;
@@ -311,9 +326,8 @@
             const savedData = localStorage.getItem('leicesterKpiData');
             if (savedData) {
                 const data = JSON.parse(savedData);
-                if (data.daysPassed) daysPassedInput.value = data.daysPassed;
                 if (data.monthSelect) monthSelect.value = data.monthSelect;
-                if (data.shiftsInput) shiftsInput.value = data.shiftsInput;
+                if (data.schedules) currentSchedules = data.schedules;
                 
                 kpiTargets.forEach(input => {
                     const kpi = input.getAttribute('data-kpi');
@@ -325,17 +339,74 @@
                 });
             }
 
+            // Render the calendar interface dynamically based on the selected month
+            function renderCalendar() {
+                const month = parseInt(monthSelect.value, 10);
+                const year = new Date().getFullYear();
+                const daysInMonth = new Date(year, month, 0).getDate();
+                const container = document.getElementById('calendar-days');
+                
+                container.innerHTML = ''; // Clear previous days
+                const monthStr = month.toString();
+                
+                if (!currentSchedules[monthStr]) {
+                    currentSchedules[monthStr] = [];
+                }
+                const scheduledDays = currentSchedules[monthStr];
+
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayDiv = document.createElement('div');
+                    dayDiv.className = 'calendar-day';
+                    dayDiv.textContent = i;
+                    
+                    if (scheduledDays.includes(i)) {
+                        dayDiv.classList.add('selected');
+                    }
+                    
+                    dayDiv.addEventListener('click', () => {
+                        const idx = scheduledDays.indexOf(i);
+                        if (idx > -1) {
+                            scheduledDays.splice(idx, 1); // Unselect
+                            dayDiv.classList.remove('selected');
+                        } else {
+                            scheduledDays.push(i); // Select
+                            dayDiv.classList.add('selected');
+                        }
+                        calculateTargets(); // Re-calculate everything automatically
+                    });
+                    
+                    container.appendChild(dayDiv);
+                }
+            }
+
             function calculateTargets() {
-                const remaining = parseInt(shiftsInput.value, 10);
-                const daysPassed = parseInt(daysPassedInput.value, 10);
                 const currentYear = new Date().getFullYear();
-                const daysInMonth = new Date(currentYear, parseInt(monthSelect.value, 10), 0).getDate();
+                const month = parseInt(monthSelect.value, 10);
+                const daysInMonth = new Date(currentYear, month, 0).getDate();
+                
+                // Calculate Passed vs Remaining dynamically
+                const scheduledDays = currentSchedules[month.toString()] || [];
+                let passed = 0;
+                let remaining = 0;
+                
+                const todayDate = new Date();
+                todayDate.setHours(0,0,0,0); // Normalize to start of day
+
+                scheduledDays.forEach(day => {
+                    const dayDate = new Date(currentYear, month - 1, day);
+                    dayDate.setHours(0,0,0,0);
+                    if (dayDate <= todayDate) passed++;
+                    else remaining++;
+                });
+
+                // Update the visual badges
+                document.getElementById('calcDaysPassed').textContent = passed;
+                document.getElementById('calcRemaining').textContent = remaining;
 
                 // Save all current inputs to the device's Local Storage
                 const dataToSave = {
-                    daysPassed: daysPassedInput.value,
                     monthSelect: monthSelect.value,
-                    shiftsInput: shiftsInput.value
+                    schedules: currentSchedules
                 };
 
                 kpiTargets.forEach(targetInput => {
@@ -371,8 +442,8 @@
                     let newRrColor = '#059669'; // default green
                     let newRrBg = 'transparent';
 
-                    if (!isNaN(mtd) && !isNaN(daysPassed) && daysPassed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
-                        const projectedTotal = (mtd / daysPassed) * daysInMonth;
+                    if (!isNaN(mtd) && passed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
+                        const projectedTotal = (mtd / passed) * daysInMonth;
                         const runRatePercent = (projectedTotal / target) * 100;
                         newRrText = runRatePercent.toFixed(2) + '%';
                         
@@ -415,9 +486,10 @@
                 localStorage.setItem('leicesterKpiData', JSON.stringify(dataToSave));
             }
 
-            shiftsInput.addEventListener('input', calculateTargets);
-            daysPassedInput.addEventListener('input', calculateTargets);
-            monthSelect.addEventListener('change', calculateTargets);
+            monthSelect.addEventListener('change', () => {
+                renderCalendar();
+                calculateTargets();
+            });
             kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
             kpiMtds.forEach(input => input.addEventListener('input', calculateTargets));
 
@@ -425,16 +497,17 @@
             document.getElementById('resetBtn').addEventListener('click', () => {
                 if(confirm('Are you sure you want to clear all numbers for the new month?')) {
                     localStorage.removeItem('leicesterKpiData');
-                    shiftsInput.value = '';
-                    daysPassedInput.value = '';
+                    currentSchedules = {};
                     kpiTargets.forEach(input => input.value = '');
                     kpiMtds.forEach(input => input.value = '');
                     monthSelect.value = new Date().getMonth() + 1; // reset to current month
+                    renderCalendar();
                     calculateTargets();
                 }
             });
 
             // Run the calculation immediately on load in case there is saved data
+            renderCalendar();
             calculateTargets();
         });
     </script>
