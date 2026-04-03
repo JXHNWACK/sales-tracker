@@ -15,6 +15,9 @@ const dataFile = path.join(dataDir, 'data.json');
 app.use(express.json());
 app.use(express.static(__dirname)); // Serves index.html automatically
 
+// Health check endpoint for Railway
+app.get('/health', (req, res) => res.status(200).send('OK'));
+
 app.get('/api/data', (req, res) => {
     // Force browsers not to cache this response
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
@@ -45,4 +48,12 @@ app.post('/api/data', (req, res) => {
     }
 });
 
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+const server = app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+
+// Graceful shutdown to prevent Railway SIGTERM errors in the logs
+process.on('SIGTERM', () => {
+    console.log('SIGTERM signal received: closing HTTP server gracefully');
+    server.close(() => {
+        process.exit(0);
+    });
+});
