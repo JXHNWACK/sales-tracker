@@ -354,10 +354,12 @@
                     const response = await fetch('/api/data');
                     if (response.ok) {
                         allAdvisorsData = await response.json();
-                        loadAdvisorData(advisorSelect.value);
                     }
                 } catch (error) {
                     console.error("Failed to fetch data:", error);
+            } finally {
+                // Initialize the UI only AFTER attempting to fetch cloud data
+                loadAdvisorData(advisorSelect.value);
                 }
             }
             fetchCloudData();
@@ -585,9 +587,6 @@
                     calIcon.style.transform = 'rotate(-90deg)';
                 }
             });
-
-            // Initialize the app by loading the first advisor's data
-            loadAdvisorData(advisorSelect.value);
         });
     </script>
 </body>
