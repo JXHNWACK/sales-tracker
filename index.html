@@ -375,7 +375,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(allAdvisorsData)
-                }).then((res) => {
+                }).then(async (res) => {
                     if (res.ok) {
                         saveBtn.textContent = '✅ Saved!';
                         saveBtn.style.backgroundColor = '#059669';
@@ -384,8 +384,9 @@
                             saveBtn.style.backgroundColor = '#10b981';
                         }, 2000);
                     } else {
-                        // If the server returns a 500 error, force it into the catch block
-                        throw new Error("Server rejected the save request");
+                        // Get the exact error message from the server
+                        const errData = await res.json().catch(() => ({}));
+                        throw new Error(errData.error || "Server rejected the save request");
                     }
                 }).catch(err => {
                     console.error("Failed to save data:", err);
@@ -395,6 +396,9 @@
                         saveBtn.textContent = '💾 Save';
                         saveBtn.style.backgroundColor = '#10b981';
                     }, 3000);
+                    
+                    // Show an alert so the user knows exactly why it failed
+                    alert("Save failed! The server says:\n\n" + err.message + "\n\nPlease let your developer know this exact message!");
                 });
             }
             

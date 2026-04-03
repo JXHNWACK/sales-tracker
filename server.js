@@ -6,11 +6,24 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Use Railway's official Volume environment variable to guarantee the save path is correct
-const dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data');
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
+let dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data');
+let dataFile;
+
+try {
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+    dataFile = path.join(dataDir, 'data.json');
+    // Self-test: Ensure we actually have permission to write to this folder
+    fs.writeFileSync(path.join(dataDir, '.test-write'), 'ok');
+} catch (err) {
+    console.error("Volume path is not writable! Falling back to local directory.", err.message);
+    dataDir = path.join(__dirname, 'data');
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+    dataFile = path.join(dataDir, 'data.json');
 }
-const dataFile = path.join(dataDir, 'data.json');
 
 app.use(express.json());
 app.use(express.static(__dirname)); // Serves index.html automatically
@@ -44,7 +57,7 @@ app.post('/api/data', (req, res) => {
         res.json({ success: true });
     } catch (error) {
         console.error("Error saving data:", error);
-        res.status(500).json({ error: "Failed to save data" });
+        res.status(500).json({ error: error.message || "Failed to save data" });
     }
 });
 
