@@ -246,7 +246,20 @@
         <div class="header-container">
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
-            <button id="resetBtn" class="btn-reset">↻ Reset All Numbers</button>
+            
+            <div class="input-group" style="max-width: 250px; margin: 1.5rem auto 0 auto;">
+                <select id="advisorSelect" style="border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
+                    <option value="advisor1">👤 Lucy</option>
+                    <option value="advisor2">👤 Luiza</option>
+                    <option value="advisor3">👤 Hamza</option>
+                    <option value="advisor4">👤 Jibraan</option>
+                    <option value="advisor5">👤 </option>
+                    <option value="advisor6">👤 Advisor 6</option>
+                    <option value="advisor7">👤 Advisor 7</option>
+                </select>
+            </div>
+            
+            <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
         </div>
         
         <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
@@ -327,30 +340,46 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const advisorSelect = document.getElementById('advisorSelect');
             const monthSelect = document.getElementById('monthSelect');
             const kpiTargets = document.querySelectorAll('.kpi-target');
             const kpiMtds = document.querySelectorAll('.kpi-mtd');
             
+            let allAdvisorsData = {}; // Will hold data for all 7 advisors
             let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
 
-            // Auto-select the current month on load
-            monthSelect.value = new Date().getMonth() + 1;
+            // Load data from the Node.js Server (Railway)
+            async function fetchCloudData() {
+                try {
+                    const response = await fetch('/api/data');
+                    if (response.ok) {
+                        allAdvisorsData = await response.json();
+                        loadAdvisorData(advisorSelect.value);
+                    }
+                } catch (error) {
+                    console.error("Failed to fetch data:", error);
+                }
+            }
+            fetchCloudData();
 
-            // Load saved data from the device's Local Storage
-            const savedData = localStorage.getItem('leicesterKpiData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                if (data.monthSelect) monthSelect.value = data.monthSelect;
-                if (data.schedules) currentSchedules = data.schedules;
+            // Function to load a specific advisor's profile into the UI
+            function loadAdvisorData(advisorId) {
+                const data = allAdvisorsData[advisorId] || {};
                 
+                monthSelect.value = data.monthSelect || (new Date().getMonth() + 1);
+                currentSchedules = data.schedules ? JSON.parse(JSON.stringify(data.schedules)) : {}; // Deep copy to prevent bugs
+
                 kpiTargets.forEach(input => {
                     const kpi = input.getAttribute('data-kpi');
-                    if (data[`target_${kpi}`] !== undefined) input.value = data[`target_${kpi}`];
+                    input.value = data[`target_${kpi}`] !== undefined ? data[`target_${kpi}`] : '';
                 });
                 kpiMtds.forEach(input => {
                     const kpi = input.getAttribute('data-kpi');
-                    if (data[`mtd_${kpi}`] !== undefined) input.value = data[`mtd_${kpi}`];
+                    input.value = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
                 });
+
+                renderCalendar();
+                calculateTargets();
             }
 
             // Render the calendar interface dynamically based on the selected month
@@ -400,6 +429,7 @@
             }
 
             function calculateTargets() {
+                const currentAdvisor = advisorSelect.value;
                 const currentYear = new Date().getFullYear();
                 const month = parseInt(monthSelect.value, 10);
                 const daysInMonth = new Date(currentYear, month, 0).getDate();
@@ -423,8 +453,8 @@
                 document.getElementById('calcDaysPassed').textContent = passed;
                 document.getElementById('calcRemaining').textContent = remaining;
 
-                // Save all current inputs to the device's Local Storage
-                const dataToSave = {
+                // Save this specific advisor's inputs to our data object
+                const advisorData = {
                     monthSelect: monthSelect.value,
                     schedules: currentSchedules
                 };
@@ -440,8 +470,8 @@
                     const mtd = parseFloat(mtdInput.value) || 0;
 
                     // Add this KPI's data to our save file
-                    dataToSave[`target_${kpiName}`] = targetInput.value;
-                    dataToSave[`mtd_${kpiName}`] = mtdInput.value;
+                    advisorData[`target_${kpiName}`] = targetInput.value;
+                    advisorData[`mtd_${kpiName}`] = mtdInput.value;
 
                     // Calculate required per remaining shift
                     let newResText = '0';
@@ -502,10 +532,22 @@
                     }
                 });
 
-                // Commit the save file
-                localStorage.setItem('leicesterKpiData', JSON.stringify(dataToSave));
+                // Update the global data object with this advisor's new numbers
+                allAdvisorsData[currentAdvisor] = advisorData;
+                
+                // Save to the Node.js Server (Railway)
+                fetch('/api/data', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(allAdvisorsData)
+                }).catch(err => console.error("Failed to save data:", err));
             }
 
+            advisorSelect.addEventListener('change', () => {
+                loadAdvisorData(advisorSelect.value);
+            });
             monthSelect.addEventListener('change', () => {
                 renderCalendar();
                 calculateTargets();
@@ -515,14 +557,17 @@
 
             // Logic for the Reset Data Button
             document.getElementById('resetBtn').addEventListener('click', () => {
-                if(confirm('Are you sure you want to clear all numbers for the new month?')) {
-                    localStorage.removeItem('leicesterKpiData');
-                    currentSchedules = {};
-                    kpiTargets.forEach(input => input.value = '');
-                    kpiMtds.forEach(input => input.value = '');
-                    monthSelect.value = new Date().getMonth() + 1; // reset to current month
-                    renderCalendar();
-                    calculateTargets();
+                const advisorName = advisorSelect.options[advisorSelect.selectedIndex].text;
+                if(confirm(`Are you sure you want to clear all numbers for ${advisorName}?`)) {
+                    delete allAdvisorsData[advisorSelect.value];
+                    
+                    fetch('/api/data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allAdvisorsData)
+                    }).catch(err => console.error("Failed to save data:", err));
+                    
+                    loadAdvisorData(advisorSelect.value);
                 }
             });
 
@@ -541,9 +586,8 @@
                 }
             });
 
-            // Run the calculation immediately on load in case there is saved data
-            renderCalendar();
-            calculateTargets();
+            // Initialize the app by loading the first advisor's data
+            loadAdvisorData(advisorSelect.value);
         });
     </script>
 </body>
