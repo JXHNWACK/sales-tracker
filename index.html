@@ -358,12 +358,41 @@
                     }
                 } catch (error) {
                     console.error("Failed to fetch data:", error);
-            } finally {
-                // Initialize the UI only AFTER attempting to fetch cloud data
-                loadAdvisorData(advisorSelect.value);
+                } finally {
+                    // Initialize the UI only AFTER attempting to fetch cloud data
+                    loadAdvisorData(advisorSelect.value);
                 }
             }
             fetchCloudData();
+
+            // Debounce network requests to prevent overlapping saves and race conditions
+            let saveTimeout;
+            let hasUnsavedChanges = false;
+            function saveToCloud() {
+                hasUnsavedChanges = true;
+                clearTimeout(saveTimeout);
+                saveTimeout = setTimeout(() => {
+                    fetch('/api/data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allAdvisorsData)
+                    }).then(() => {
+                        hasUnsavedChanges = false;
+                    }).catch(err => console.error("Failed to save data:", err));
+                }, 600);
+            }
+
+            // Guarantee save if the user refreshes or closes the page right after typing
+            window.addEventListener('beforeunload', () => {
+                if (hasUnsavedChanges) {
+                    fetch('/api/data', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(allAdvisorsData),
+                        keepalive: true
+                    });
+                }
+            });
 
             // Function to load a specific advisor's profile into the UI
             function loadAdvisorData(advisorId) {
@@ -539,13 +568,7 @@
                 allAdvisorsData[currentAdvisor] = advisorData;
                 
                 // Save to the Node.js Server (Railway)
-                fetch('/api/data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(allAdvisorsData)
-                }).catch(err => console.error("Failed to save data:", err));
+                saveToCloud();
             }
 
             advisorSelect.addEventListener('change', () => {
@@ -564,11 +587,7 @@
                 if(confirm(`Are you sure you want to clear all numbers for ${advisorName}?`)) {
                     delete allAdvisorsData[advisorSelect.value];
                     
-                    fetch('/api/data', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(allAdvisorsData)
-                    }).catch(err => console.error("Failed to save data:", err));
+                    saveToCloud();
                     
                     loadAdvisorData(advisorSelect.value);
                 }

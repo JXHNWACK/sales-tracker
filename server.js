@@ -5,10 +5,10 @@ const fs = require('fs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Define data directory
-const dataDir = path.join(__dirname, 'data');
+// Use Railway's explicit volume path if it exists, otherwise use local data folder
+const dataDir = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, 'data');
 if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+    fs.mkdirSync(dataDir, { recursive: true });
 }
 const dataFile = path.join(dataDir, 'data.json');
 
