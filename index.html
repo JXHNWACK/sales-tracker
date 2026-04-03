@@ -228,6 +228,16 @@
             border-color: var(--primary-color);
             box-shadow: 0 2px 4px rgba(79, 70, 229, 0.3);
         }
+        .calendar-day.weekend {
+            background-color: #fff1f2;
+            border-color: #fecdd3;
+            color: #e11d48;
+        }
+        .calendar-day.weekend.selected {
+            background-color: #e11d48;
+            border-color: #e11d48;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -241,7 +251,9 @@
         
         <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <label style="margin: 0; font-size: 0.95rem; font-weight: 700;">📅 Select Scheduled Shifts</label>
+                <label id="toggleCalendarBtn" style="margin: 0; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
+                    📅 Select Scheduled Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block;">▼</span>
+                </label>
                 <div class="input-group" style="margin: 0; width: 110px;">
                     <select id="monthSelect" style="height: 34px; padding: 0.25rem 0.5rem;">
                         <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
@@ -251,8 +263,10 @@
                     </select>
                 </div>
             </div>
-            <div id="calendar-days" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
-                <!-- JS will populate days here -->
+            <div id="calendarCollapse">
+                <div id="calendar-days" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
+                    <!-- JS will populate days here -->
+                </div>
             </div>
             <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: white; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
                 <div style="color: var(--text-muted)">Days Passed (MTD): <span id="calcDaysPassed" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
@@ -358,6 +372,12 @@
                     const dayDiv = document.createElement('div');
                     dayDiv.className = 'calendar-day';
                     dayDiv.textContent = i;
+
+                    const dateObj = new Date(year, month - 1, i);
+                    const dayOfWeek = dateObj.getDay();
+                    if (dayOfWeek === 0 || dayOfWeek === 6) {
+                        dayDiv.classList.add('weekend');
+                    }
                     
                     if (scheduledDays.includes(i)) {
                         dayDiv.classList.add('selected');
@@ -503,6 +523,21 @@
                     monthSelect.value = new Date().getMonth() + 1; // reset to current month
                     renderCalendar();
                     calculateTargets();
+                }
+            });
+
+            // Collapsible Calendar Logic
+            const toggleBtn = document.getElementById('toggleCalendarBtn');
+            const collapseArea = document.getElementById('calendarCollapse');
+            const calIcon = document.getElementById('calendarIcon');
+            
+            toggleBtn.addEventListener('click', () => {
+                if (collapseArea.style.display === 'none') {
+                    collapseArea.style.display = 'block';
+                    calIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    collapseArea.style.display = 'none';
+                    calIcon.style.transform = 'rotate(-90deg)';
                 }
             });
 
