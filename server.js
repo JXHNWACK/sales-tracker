@@ -16,16 +16,28 @@ app.use(express.json());
 app.use(express.static(__dirname)); // Serves index.html automatically
 
 app.get('/api/data', (req, res) => {
-    if (fs.existsSync(dataFile)) {
-        res.json(JSON.parse(fs.readFileSync(dataFile, 'utf8')));
-    } else {
-        res.json({});
+    try {
+        if (fs.existsSync(dataFile)) {
+            const fileContent = fs.readFileSync(dataFile, 'utf8');
+            // If the file is empty, return an empty object instead of crashing
+            res.json(fileContent ? JSON.parse(fileContent) : {});
+        } else {
+            res.json({});
+        }
+    } catch (error) {
+        console.error("Error reading data:", error);
+        res.json({}); // Failsafe so the app continues to load
     }
 });
 
 app.post('/api/data', (req, res) => {
-    fs.writeFileSync(dataFile, JSON.stringify(req.body, null, 2));
-    res.json({ success: true });
+    try {
+        fs.writeFileSync(dataFile, JSON.stringify(req.body, null, 2));
+        res.json({ success: true });
+    } catch (error) {
+        console.error("Error saving data:", error);
+        res.status(500).json({ error: "Failed to save data" });
+    }
 });
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
