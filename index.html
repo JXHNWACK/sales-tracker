@@ -243,6 +243,9 @@
 <body>
 
     <div class="calculator-card">
+        <div id="urlWarning" style="display: none; background-color: #fef2f2; color: #dc2626; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; text-align: center; border: 1px solid #fecaca; font-weight: bold; font-size: 0.95rem;">
+            ⚠️ READ-ONLY MODE: You are viewing this on GitHub. To save data, please open your Railway app link instead!
+        </div>
         <div class="header-container">
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
@@ -348,6 +351,12 @@
             
             let allAdvisorsData = {}; // Will hold data for all 7 advisors
             let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
+
+            // Check if user is on GitHub Pages or a local file instead of Railway
+            const currentUrl = window.location.href;
+            if (currentUrl.includes('github.io') || currentUrl.startsWith('file://')) {
+                document.getElementById('urlWarning').style.display = 'block';
+            }
 
             // Load data from the Node.js Server (Railway)
             async function fetchCloudData() {
