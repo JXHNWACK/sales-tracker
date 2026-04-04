@@ -287,6 +287,7 @@
     </style>
     <!-- Load Chart.js for the Leaderboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -557,6 +558,9 @@
                 monthSelect.value = data.monthSelect || (new Date().getMonth() + 1);
                 currentSchedules = data.schedules ? JSON.parse(JSON.stringify(data.schedules)) : {}; // Deep copy to prevent bugs
 
+                // Reset the confetti trackers when switching advisors
+                document.querySelectorAll('[id^="rr-"]').forEach(el => el.dataset.wasOnTrack = '');
+
                 kpiTargets.forEach(input => {
                     const kpi = input.getAttribute('data-kpi');
                     input.value = data[`target_${kpi}`] !== undefined ? data[`target_${kpi}`] : '';
@@ -690,6 +694,8 @@
                     let newRrColor = '#059669'; // default green
                     let newRrBg = 'transparent';
 
+                    let isCurrentlyOnTrack = false;
+
                     if (!isNaN(mtd) && passed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
                         const projectedTotal = (mtd / passed) * daysInMonth;
                         const runRatePercent = (projectedTotal / target) * 100;
@@ -700,8 +706,22 @@
                             newRrBg = '#fef2f2';
                         } else {
                             newRrBg = '#ecfdf5';
+                            isCurrentlyOnTrack = true;
                         }
                     }
+
+                    // Trigger confetti if this individual KPI just hit 100%!
+                    if (isCurrentlyOnTrack && rrDisplay.dataset.wasOnTrack !== 'true') {
+                        if (typeof confetti === 'function') {
+                            confetti({
+                                particleCount: 50,
+                                spread: 60,
+                                origin: { y: 0.6 },
+                                zIndex: 9999
+                            });
+                        }
+                    }
+                    rrDisplay.dataset.wasOnTrack = isCurrentlyOnTrack ? 'true' : 'false';
 
                     rrDisplay.style.borderRadius = '6px';
                     rrDisplay.style.padding = '0.1rem 0.4rem';
