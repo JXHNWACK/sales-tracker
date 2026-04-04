@@ -239,6 +239,8 @@
             color: white;
         }
     </style>
+    <!-- Load Chart.js for the Leaderboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -341,6 +343,25 @@
                 <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0.00</div><div class="result-label">Req/Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-ACCESSORIES"></div></div></div>
             </div>
         </div>
+
+        <div class="leaderboard-section" style="margin-top: 2rem; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);">🏆 Team Leaderboard (MTD)</h3>
+                <select id="leaderboardKpiSelect" style="width: auto; height: 34px; padding: 0.25rem 0.5rem; font-weight: bold; color: var(--primary-color);">
+                    <option value="POINTS">POINTS</option>
+                    <option value="CV">CV</option>
+                    <option value="HBB">HBB</option>
+                    <option value="MBB">MBB</option>
+                    <option value="RET">RET</option>
+                    <option value="B2B">B2B</option>
+                    <option value="PAYG">PAYG</option>
+                    <option value="ACCESSORIES">ACCESSORIES</option>
+                </select>
+            </div>
+            <div style="position: relative; height: 250px; width: 100%;">
+                <canvas id="leaderboardChart"></canvas>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -365,6 +386,7 @@
 
             let allAdvisorsData = {}; // Will hold data for all 7 advisors
             let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
+            let leaderboardChart = null; // Global variable to hold our Chart.js instance
 
             // Check if user is on GitHub Pages or a local file instead of Railway
             const currentUrl = window.location.href;
@@ -607,6 +629,47 @@
 
                 // Update the global data object with this advisor's new numbers
                 allAdvisorsData[currentAdvisor] = advisorData;
+                
+                // Automatically refresh the leaderboard chart
+                updateLeaderboard();
+            }
+
+            function updateLeaderboard() {
+                const kpi = document.getElementById('leaderboardKpiSelect').value;
+                const labels = ["Lucy", "Luiza", "Hamza", "Jibraan", "Pratiksha", "Hayley", "Amirah"];
+                const advisorKeys = ["advisor1", "advisor2", "advisor3", "advisor4", "advisor5", "advisor6", "advisor7"];
+
+                const dataPoints = advisorKeys.map(key => {
+                    const advData = allAdvisorsData[key];
+                    if (advData && advData[`mtd_${kpi}`]) {
+                        return parseFloat(advData[`mtd_${kpi}`]) || 0;
+                    }
+                    return 0;
+                });
+
+                if (leaderboardChart) {
+                    leaderboardChart.data.datasets[0].data = dataPoints;
+                    leaderboardChart.update();
+                } else {
+                    const ctx = document.getElementById('leaderboardChart').getContext('2d');
+                    leaderboardChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'MTD',
+                                data: dataPoints,
+                                backgroundColor: '#4f46e5',
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
             }
 
             advisorSelect.addEventListener('change', () => {
@@ -619,6 +682,10 @@
             });
             kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
             kpiMtds.forEach(input => input.addEventListener('input', calculateTargets));
+
+            document.getElementById('leaderboardKpiSelect').addEventListener('change', () => {
+                updateLeaderboard();
+            });
 
             // Logic for the Reset Data Button
             document.getElementById('resetBtn').addEventListener('click', () => {
