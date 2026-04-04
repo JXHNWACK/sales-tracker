@@ -399,124 +399,18 @@
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
         </div>
         
-        <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: rgba(248, 250, 252, 0.5); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.6);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <label id="toggleCalendarBtn" class="calendar-toggle-btn">
-                    📅 Working Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(-90deg);">▼</span>
-                </label>
-                <div class="input-group" style="margin: 0; width: 110px;">
-                    <select id="monthSelect" style="height: 34px; padding: 0.25rem 0.5rem;">
-                        <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
-                        <option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option>
-                        <option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option>
-                        <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
-                    </select>
-                </div>
-            </div>
-            <div id="calendarCollapse" style="display: none;">
-                <div id="calendar-days" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
-                    <!-- JS will populate days here -->
-                </div>
-            </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: rgba(255, 255, 255, 0.6); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.6); font-weight: 600;">
-                <div style="color: var(--text-muted)">Days Passed (MTD): <span id="calcDaysPassed" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
-                <div style="color: var(--text-muted)">Remaining Shifts: <span id="calcRemaining" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
-            </div>
-        </div>
-
-        <!-- The style updates above automatically apply to these grid items -->
-        <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 0.75rem;">
-            <label id="toggleKpiBtn" class="calendar-toggle-btn">
-                📊 KPI Targets & MTD <span id="kpiIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(0deg);">▼</span>
-            </label>
-        </div>
-        <div id="kpiCollapse">
-            <div class="grid-container">
-                <div class="input-group">
-                    <label>🎯 POINTS</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-POINTS">
-                            <button type="button" class="mtd-btn down" data-kpi="POINTS" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="POINTS" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>📄 CV</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-CV">
-                            <button type="button" class="mtd-btn down" data-kpi="CV" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="CV" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>🏠 HBB</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-HBB">
-                            <button type="button" class="mtd-btn down" data-kpi="HBB" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="HBB" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>📱 MBB</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-MBB">
-                            <button type="button" class="mtd-btn down" data-kpi="MBB" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="MBB" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>🔄 RET</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-RET">
-                            <button type="button" class="mtd-btn down" data-kpi="RET" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="RET" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>💳 PAYG</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-PAYG">
-                            <button type="button" class="mtd-btn down" data-kpi="PAYG" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="PAYG" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>💼 B2B</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-B2B">
-                            <button type="button" class="mtd-btn down" data-kpi="B2B" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="B2B" tabindex="-1">▲</button>
-                        </div>
-                    </div>
-                </div>
-                <div class="input-group">
-                    <label>🎧 ACC</label>
-                    <div style="display: flex; gap: 0.25rem;">
-                        <input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any" style="flex: 0.8;">
-                        <div class="mtd-controls" id="mtd-ctrl-ACCESSORIES">
-                            <button type="button" class="mtd-btn down" data-kpi="ACCESSORIES" tabindex="-1">▼</button>
-                            <input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any">
-                            <button type="button" class="mtd-btn up" data-kpi="ACCESSORIES" tabindex="-1">▲</button>
+        <div id="mainContent" style="display: none;">
+            <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: rgba(248, 250, 252, 0.5); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.6);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+                    <label id="toggleCalendarBtn" class="calendar-toggle-btn">
+                        📅 Working Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(-90deg);">▼</span>
+                    </label>
+                    <div class="input-group" style="margin: 0; width: 110px;">
+                        <select id="monthSelect" style="height: 34px; padding: 0.25rem 0.5rem;">
+                            <option value="1">Jan</option><option value="2">Feb</option><option value="3">Mar</option>
+                            <option value="4">Apr</option><option value="5">May</option><option value="6">Jun</option>
+                            <option value="7">Jul</option><option value="8">Aug</option><option value="9">Sep</option>
+                            <option value="10">Oct</option><option value="11">Nov</option><option value
                         </div>
                     </div>
                 </div>
@@ -613,6 +507,9 @@
                 saveBtn.disabled = isDefault;
                 saveBtn.style.opacity = isDefault ? '0.5' : '1';
                 saveBtn.style.cursor = isDefault ? 'not-allowed' : 'pointer';
+
+                document.getElementById('dashboardContent').style.display = isDefault ? 'none' : 'block';
+                document.getElementById('welcomeMessage').style.display = isDefault ? 'block' : 'none';
             }
 
             roleSelect.addEventListener('change', () => {
