@@ -346,7 +346,7 @@
 
         <div class="leaderboard-section" style="margin-top: 2rem; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3 style="margin: 0; color: var(--text-main);">🏆 Team Leaderboard (MTD)</h3>
+                <h3 style="margin: 0; color: var(--text-main);">🏆 Team Leaderboard (Run Rate %)</h3>
                 <select id="leaderboardKpiSelect" style="width: auto; height: 34px; padding: 0.25rem 0.5rem; font-weight: bold; color: var(--primary-color);">
                     <option value="POINTS">POINTS</option>
                     <option value="CV">CV</option>
@@ -638,17 +638,41 @@
                 const kpi = document.getElementById('leaderboardKpiSelect').value;
                 const labels = ["Lucy", "Luiza", "Hamza", "Jibraan", "Pratiksha", "Hayley", "Amirah"];
                 const advisorKeys = ["advisor1", "advisor2", "advisor3", "advisor4", "advisor5", "advisor6", "advisor7"];
+                const currentYear = new Date().getFullYear();
 
                 const dataPoints = advisorKeys.map(key => {
                     const advData = allAdvisorsData[key];
-                    if (advData && advData[`mtd_${kpi}`]) {
-                        return parseFloat(advData[`mtd_${kpi}`]) || 0;
+                    if (!advData) return 0;
+                    
+                    const target = parseFloat(advData[`target_${kpi}`]) || 0;
+                    const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
+                    
+                    const month = parseInt(advData.monthSelect || document.getElementById('monthSelect').value, 10);
+                    const daysInMonth = new Date(currentYear, month, 0).getDate();
+                    const scheduledDays = (advData.schedules && advData.schedules[month.toString()]) ? advData.schedules[month.toString()] : [];
+                    
+                    let passed = 0;
+                    const todayDate = new Date();
+                    todayDate.setHours(0,0,0,0);
+
+                    scheduledDays.forEach(day => {
+                        const dayDate = new Date(currentYear, month - 1, day);
+                        dayDate.setHours(0,0,0,0);
+                        if (dayDate <= todayDate) passed++;
+                    });
+
+                    if (mtd > 0 && passed > 0 && target > 0 && daysInMonth > 0) {
+                        const projectedTotal = (mtd / passed) * daysInMonth;
+                        return parseFloat(((projectedTotal / target) * 100).toFixed(2));
                     }
                     return 0;
                 });
+                
+                const bgColors = dataPoints.map(val => val >= 100 ? '#10b981' : '#ef4444');
 
                 if (leaderboardChart) {
                     leaderboardChart.data.datasets[0].data = dataPoints;
+                    leaderboardChart.data.datasets[0].backgroundColor = bgColors;
                     leaderboardChart.update();
                 } else {
                     const ctx = document.getElementById('leaderboardChart').getContext('2d');
@@ -657,16 +681,34 @@
                         data: {
                             labels: labels,
                             datasets: [{
-                                label: 'MTD',
+                                label: 'Run Rate %',
                                 data: dataPoints,
-                                backgroundColor: '#4f46e5',
+                                backgroundColor: bgColors,
                                 borderRadius: 6
                             }]
                         },
                         options: {
                             responsive: true,
                             maintainAspectRatio: false,
-                            plugins: { legend: { display: false } }
+                            plugins: { 
+                                legend: { display: false },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.parsed.y + '%';
+                                        }
+                                    }
+                                }
+                            },
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Run Rate %'
+                                    }
+                                }
+                            }
                         }
                     });
                 }
