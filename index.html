@@ -246,6 +246,25 @@
             border-color: #e11d48;
             color: white;
         }
+        
+        /* Mobile Compact Adjustments */
+        @media (max-width: 600px) {
+            body { padding: 8px; }
+            .calculator-card { padding: 1rem; border-radius: 16px; }
+            h2 { font-size: 1.4rem; }
+            .header-container { margin-bottom: 1rem; }
+            .grid-container { gap: 0.4rem; }
+            .grid-container > .input-group { padding: 0.4rem; }
+            .result-box { padding: 0.5rem 0.25rem; }
+            .result-value { font-size: 1rem !important; }
+            .result-label { font-size: 0.7rem; }
+            .schedule-section { padding: 0.75rem !important; margin-bottom: 1rem !important; }
+            .calendar-day { width: 30px; height: 30px; font-size: 0.85rem; }
+            #calendar-days { gap: 0.3rem !important; }
+            .store-badge { padding: 0.25rem 0.75rem; font-size: 0.75rem; margin-bottom: 0.5rem; }
+            #advisorImage { width: 36px !important; height: 36px !important; }
+            .leaderboard-section { margin-top: 1.5rem !important; padding-top: 1rem !important; }
+        }
     </style>
     <!-- Load Chart.js for the Leaderboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -260,17 +279,17 @@
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
             
-            <div style="margin-top: 0.75rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
-                <select id="roleSelect" style="width: auto; height: 32px; padding: 0.25rem 0.75rem; border-radius: 999px; border-color: var(--primary-color); font-weight: bold; color: white; background-color: var(--primary-color); cursor: pointer; font-size: 0.85rem; text-align: center; outline: none;">
-                    <option value="advisor">👤 View Mode: Advisor</option>
-                    <option value="manager">👑 View Mode: Manager</option>
+            <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.4rem; flex-wrap: nowrap;">
+                <select id="roleSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border-color: var(--primary-color); font-weight: bold; color: white; background-color: var(--primary-color); cursor: pointer; font-size: 0.75rem; text-align: center; outline: none;">
+                    <option value="advisor">👤 Advisor</option>
+                    <option value="manager">👑 Manager</option>
                 </select>
-                <select id="themeSelect" style="width: auto; height: 32px; padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid #cbd5e1; font-weight: bold; color: var(--text-muted); background-color: white; cursor: pointer; font-size: 0.85rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                    <option value="blue">🎨 Theme: Blue</option>
-                    <option value="mint">🎨 Theme: Mint</option>
-                    <option value="peach">🎨 Theme: Peach</option>
-                    <option value="purple">🎨 Theme: Purple</option>
-                    <option value="pink">🎨 Theme: Pink</option>
+                <select id="themeSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid #cbd5e1; font-weight: bold; color: var(--text-muted); background-color: white; cursor: pointer; font-size: 0.75rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <option value="blue">🎨 Blue</option>
+                    <option value="mint">🎨 Mint</option>
+                    <option value="peach">🎨 Peach</option>
+                    <option value="purple">🎨 Purple</option>
+                    <option value="pink">🎨 Pink</option>
                 </select>
             </div>
             
