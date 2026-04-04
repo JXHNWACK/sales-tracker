@@ -384,6 +384,7 @@
             <div class="input-group" style="max-width: 400px; margin: 1.5rem auto 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                 <img id="advisorImage" src="https://ui-avatars.com/api/?name=Lucy&background=e0e7ff&color=4f46e5&rounded=true" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--primary-color);">
                 <select id="advisorSelect" style="flex: 1; border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
+                    <option value="default" disabled selected>👋 Select Advisor...</option>
                     <option value="advisor1">👤 Lucy</option>
                     <option value="advisor2">👤 Luiza</option>
                     <option value="advisor3">👤 Hamza</option>
@@ -567,6 +568,7 @@
             
             // To use custom photos, paste the direct image link (ending in .jpg or .png) between the quotes!
             const advisorImages = {
+                "default": "https://ui-avatars.com/api/?name=👋&background=e0e7ff&color=4f46e5&rounded=true",
                 "advisor1": "https://ui-avatars.com/api/?name=LW&background=e0e7ff&color=4f46e5&rounded=true",      // <-- Replace this link for Lucy
                 "advisor2": "https://ui-avatars.com/api/?name=LV&background=e0e7ff&color=4f46e5&rounded=true",     // <-- Replace this link for Luiza
                 "advisor3": "https://ui-avatars.com/api/?name=HA&background=e0e7ff&color=4f46e5&rounded=true",     // <-- Replace this link for Hamza
@@ -593,18 +595,24 @@
 
             function applyRolePermissions() {
                 const isManager = roleSelect.value === 'manager';
+                const isDefault = advisorSelect.value === 'default';
                 
-                kpiTargets.forEach(input => input.disabled = !isManager);
+                kpiTargets.forEach(input => input.disabled = !isManager || isDefault);
                 kpiMtds.forEach(input => {
-                    input.disabled = isManager;
+                    input.disabled = isManager || isDefault;
                     const ctrl = document.getElementById(`mtd-ctrl-${input.getAttribute('data-kpi')}`);
                     if(ctrl) {
-                        if(isManager) ctrl.classList.add('disabled');
+                        if(isManager || isDefault) ctrl.classList.add('disabled');
                         else ctrl.classList.remove('disabled');
                     }
                 });
-                document.getElementById('monthSelect').disabled = !isManager;
-                document.getElementById('resetBtn').style.display = isManager ? 'inline-block' : 'none';
+                document.getElementById('monthSelect').disabled = !isManager || isDefault;
+                document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
+
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.disabled = isDefault;
+                saveBtn.style.opacity = isDefault ? '0.5' : '1';
+                saveBtn.style.cursor = isDefault ? 'not-allowed' : 'pointer';
             }
 
             roleSelect.addEventListener('change', () => {
@@ -636,6 +644,13 @@
                 } catch (error) {
                     console.error("Failed to fetch data:", error);
                 } finally {
+                    const lastAdvisor = localStorage.getItem('lastSavedAdvisor');
+                    if (lastAdvisor && document.querySelector(`#advisorSelect option[value="${lastAdvisor}"]`)) {
+                        advisorSelect.value = lastAdvisor;
+                    } else {
+                        advisorSelect.value = 'default';
+                    }
+                    
                     // Initialize the UI only AFTER attempting to fetch cloud data
                     loadAdvisorData(advisorSelect.value);
                     advisorImage.src = advisorImages[advisorSelect.value]; // Ensure image matches dropdown on load
@@ -872,8 +887,10 @@
                     }
                 });
 
-                // Update the global data object with this advisor's new numbers
-                allAdvisorsData[currentAdvisor] = advisorData;
+                if (currentAdvisor !== 'default') {
+                    // Update the global data object with this advisor's new numbers
+                    allAdvisorsData[currentAdvisor] = advisorData;
+                }
                 
                 // Automatically refresh the leaderboard chart
                 updateLeaderboard();
@@ -996,8 +1013,10 @@
             }
 
             advisorSelect.addEventListener('change', () => {
+                localStorage.setItem('lastSavedAdvisor', advisorSelect.value);
                 advisorImage.src = advisorImages[advisorSelect.value];
                 loadAdvisorData(advisorSelect.value);
+                applyRolePermissions();
             });
             monthSelect.addEventListener('change', () => {
                 renderCalendar();
