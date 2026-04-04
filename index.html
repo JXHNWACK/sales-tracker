@@ -540,7 +540,7 @@
                 scheduledDays.forEach(day => {
                     const dayDate = new Date(currentYear, month - 1, day);
                     dayDate.setHours(0,0,0,0);
-                    if (dayDate <= todayDate) passed++;
+                    if (dayDate < todayDate) passed++;
                     else remaining++;
                 });
 
@@ -658,7 +658,7 @@
                     scheduledDays.forEach(day => {
                         const dayDate = new Date(currentYear, month - 1, day);
                         dayDate.setHours(0,0,0,0);
-                        if (dayDate <= todayDate) passed++;
+                        if (dayDate < todayDate) passed++;
                     });
 
                     if (mtd > 0 && passed > 0 && target > 0 && daysInMonth > 0) {
