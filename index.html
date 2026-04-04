@@ -260,10 +260,17 @@
             <div class="store-badge">📍 Leicester Gallowtree Gate</div>
             <h2>KPI Target Calculator</h2>
             
-            <div style="margin-top: 0.75rem; display: flex; justify-content: center;">
+            <div style="margin-top: 0.75rem; display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
                 <select id="roleSelect" style="width: auto; height: 32px; padding: 0.25rem 0.75rem; border-radius: 999px; border-color: var(--primary-color); font-weight: bold; color: white; background-color: var(--primary-color); cursor: pointer; font-size: 0.85rem; text-align: center; outline: none;">
                     <option value="advisor">👤 View Mode: Advisor</option>
                     <option value="manager">👑 View Mode: Manager</option>
+                </select>
+                <select id="themeSelect" style="width: auto; height: 32px; padding: 0.25rem 0.75rem; border-radius: 999px; border: 1px solid #cbd5e1; font-weight: bold; color: var(--text-muted); background-color: white; cursor: pointer; font-size: 0.85rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                    <option value="blue">🎨 Theme: Blue</option>
+                    <option value="mint">🎨 Theme: Mint</option>
+                    <option value="peach">🎨 Theme: Peach</option>
+                    <option value="purple">🎨 Theme: Purple</option>
+                    <option value="pink">🎨 Theme: Pink</option>
                 </select>
             </div>
             
@@ -398,6 +405,14 @@
                 "advisor6": "https://ui-avatars.com/api/?name=HE&background=e0e7ff&color=4f46e5&rounded=true",    // <-- Replace this link for Hayley
                 "advisor7": "https://ui-avatars.com/api/?name=AB&background=e0e7ff&color=4f46e5&rounded=true"     // <-- Replace this link for Amirah
             };
+            
+            const themes = {
+                "blue": "linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%)",
+                "mint": "linear-gradient(135deg, #d1fae5 0%, #f0fdf4 100%)",
+                "peach": "linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%)",
+                "purple": "linear-gradient(135deg, #f3e8ff 0%, #f8fafc 100%)",
+                "pink": "linear-gradient(135deg, #fce7f3 0%, #fff1f2 100%)"
+            };
 
             let allAdvisorsData = {}; // Will hold data for all 7 advisors
             let currentSchedules = {}; // Object to store scheduled days by month, e.g. { "4": [6,7,8,10] }
@@ -513,6 +528,10 @@
                     input.value = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
                 });
 
+                const savedTheme = data.theme || "blue";
+                document.getElementById('themeSelect').value = savedTheme;
+                document.body.style.background = themes[savedTheme];
+
                 renderCalendar();
                 calculateTargets();
             }
@@ -596,7 +615,8 @@
                 // Save this specific advisor's inputs to our data object
                 const advisorData = {
                     monthSelect: monthSelect.value,
-                    schedules: currentSchedules
+                    schedules: currentSchedules,
+                    theme: document.getElementById('themeSelect').value
                 };
 
                 kpiTargets.forEach(targetInput => {
@@ -765,6 +785,10 @@
             });
             monthSelect.addEventListener('change', () => {
                 renderCalendar();
+                calculateTargets();
+            });
+            document.getElementById('themeSelect').addEventListener('change', () => {
+                document.body.style.background = themes[document.getElementById('themeSelect').value];
                 calculateTargets();
             });
             kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
