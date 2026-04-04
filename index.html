@@ -247,6 +247,25 @@
             color: white;
         }
         
+        .calendar-toggle-btn {
+            margin: 0;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            user-select: none;
+            padding: 0.4rem 0.75rem;
+            background-color: #e2e8f0;
+            border-radius: 8px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+        .calendar-toggle-btn:hover {
+            background-color: #cbd5e1;
+            color: var(--primary-color);
+        }
+        
         /* Mobile Compact Adjustments */
         @media (max-width: 600px) {
             body { padding: 8px; }
@@ -312,8 +331,8 @@
         
         <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
-                <label id="toggleCalendarBtn" style="margin: 0; font-size: 0.95rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.5rem; user-select: none;">
-                    📅 Select Scheduled Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block;">▼</span>
+                <label id="toggleCalendarBtn" class="calendar-toggle-btn">
+                    📅 Select Scheduled Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(-90deg);">▼</span>
                 </label>
                 <div class="input-group" style="margin: 0; width: 110px;">
                     <select id="monthSelect" style="height: 34px; padding: 0.25rem 0.5rem;">
@@ -324,7 +343,7 @@
                     </select>
                 </div>
             </div>
-            <div id="calendarCollapse">
+            <div id="calendarCollapse" style="display: none;">
                 <div id="calendar-days" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.75rem;">
                     <!-- JS will populate days here -->
                 </div>
