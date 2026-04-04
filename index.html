@@ -326,7 +326,7 @@
                     <option value="advisor6">👤 Hayley</option>
                     <option value="advisor7">👤 Amirah</option>
                 </select>
-                <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s;">💾 Save</button>
+                <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; height: 40px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s;">💾 Save</button>
             </div>
             
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
@@ -358,38 +358,45 @@
         </div>
 
         <!-- The style updates above automatically apply to these grid items -->
-        <div class="grid-container">
-            <div class="input-group">
-                <label>🎯 POINTS</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>📄 CV</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>🏠 HBB</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>📱 MBB</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>🔄 RET</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>💳 PAYG</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>💼 B2B</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any"></div>
-            </div>
-            <div class="input-group">
-                <label>🎧 ACC</label>
-                <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any"></div>
+        <div style="display: flex; justify-content: flex-start; align-items: center; margin-bottom: 0.75rem;">
+            <label id="toggleKpiBtn" class="calendar-toggle-btn">
+                📊 KPI Targets & MTD <span id="kpiIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(0deg);">▼</span>
+            </label>
+        </div>
+        <div id="kpiCollapse">
+            <div class="grid-container">
+                <div class="input-group">
+                    <label>🎯 POINTS</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>📄 CV</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>🏠 HBB</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>📱 MBB</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>🔄 RET</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>💳 PAYG</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>💼 B2B</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any"></div>
+                </div>
+                <div class="input-group">
+                    <label>🎧 ACC</label>
+                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any"></div>
+                </div>
             </div>
         </div>
 
@@ -902,6 +909,21 @@
                 } else {
                     collapseArea.style.display = 'none';
                     calIcon.style.transform = 'rotate(-90deg)';
+                }
+            });
+
+            // Collapsible KPI Input Logic
+            const toggleKpiBtn = document.getElementById('toggleKpiBtn');
+            const kpiCollapseArea = document.getElementById('kpiCollapse');
+            const kpiIcon = document.getElementById('kpiIcon');
+            
+            toggleKpiBtn.addEventListener('click', () => {
+                if (kpiCollapseArea.style.display === 'none') {
+                    kpiCollapseArea.style.display = 'block';
+                    kpiIcon.style.transform = 'rotate(0deg)';
+                } else {
+                    kpiCollapseArea.style.display = 'none';
+                    kpiIcon.style.transform = 'rotate(-90deg)';
                 }
             });
         });
