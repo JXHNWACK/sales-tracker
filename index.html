@@ -652,12 +652,7 @@
                 } catch (error) {
                     console.error("Failed to fetch data:", error);
                 } finally {
-                    const lastAdvisor = localStorage.getItem('lastSavedAdvisor');
-                    if (lastAdvisor && document.querySelector(`#advisorSelect option[value="${lastAdvisor}"]`)) {
-                        advisorSelect.value = lastAdvisor;
-                    } else {
-                        advisorSelect.value = 'default';
-                    }
+                    advisorSelect.value = 'default';
                     
                     // Initialize the UI only AFTER attempting to fetch cloud data
                     loadAdvisorData(advisorSelect.value);
@@ -1021,7 +1016,6 @@
             }
 
             advisorSelect.addEventListener('change', () => {
-                localStorage.setItem('lastSavedAdvisor', advisorSelect.value);
                 advisorImage.src = advisorImages[advisorSelect.value];
                 loadAdvisorData(advisorSelect.value);
                 applyRolePermissions();
