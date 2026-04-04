@@ -127,6 +127,70 @@
             box-shadow: none;
         }
 
+        .mtd-controls {
+            display: flex;
+            align-items: stretch;
+            flex: 1.2;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            overflow: hidden;
+            background-color: #f8fafc;
+            transition: all 0.2s ease;
+            height: 40px;
+        }
+        .mtd-controls:focus-within {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+            background-color: #ffffff;
+        }
+        .mtd-controls input {
+            border: none !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            padding: 0 0.25rem !important;
+            text-align: center;
+            flex: 1;
+            width: 100%;
+            -moz-appearance: textfield;
+            font-weight: 600;
+        }
+        .mtd-controls input::-webkit-outer-spin-button,
+        .mtd-controls input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .mtd-btn {
+            background: #e2e8f0;
+            border: none;
+            color: #475569;
+            padding: 0 0.75rem;
+            cursor: pointer;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .mtd-btn:hover {
+            background: #cbd5e1;
+            color: var(--primary-color);
+        }
+        .mtd-btn:active {
+            background: #94a3b8;
+        }
+        .mtd-controls.disabled {
+            background-color: #e2e8f0;
+        }
+        .mtd-controls.disabled .mtd-btn {
+            cursor: not-allowed;
+            color: #94a3b8;
+        }
+        .mtd-controls.disabled .mtd-btn:hover {
+            background: #e2e8f0;
+        }
+
         .grid-container {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -367,35 +431,91 @@
             <div class="grid-container">
                 <div class="input-group">
                     <label>🎯 POINTS</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="POINTS" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-POINTS">
+                            <button type="button" class="mtd-btn down" data-kpi="POINTS" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="POINTS" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="POINTS" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>📄 CV</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="CV" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-CV">
+                            <button type="button" class="mtd-btn down" data-kpi="CV" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="CV" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="CV" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>🏠 HBB</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="HBB" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-HBB">
+                            <button type="button" class="mtd-btn down" data-kpi="HBB" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="HBB" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="HBB" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>📱 MBB</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="MBB" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-MBB">
+                            <button type="button" class="mtd-btn down" data-kpi="MBB" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="MBB" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="MBB" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>🔄 RET</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="RET" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-RET">
+                            <button type="button" class="mtd-btn down" data-kpi="RET" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="RET" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="RET" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>💳 PAYG</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="PAYG" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-PAYG">
+                            <button type="button" class="mtd-btn down" data-kpi="PAYG" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="PAYG" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="PAYG" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>💼 B2B</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="B2B" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-B2B">
+                            <button type="button" class="mtd-btn down" data-kpi="B2B" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="B2B" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="B2B" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="input-group">
                     <label>🎧 ACC</label>
-                    <div style="display: flex; gap: 0.25rem;"><input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any"><input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any"></div>
+                    <div style="display: flex; gap: 0.25rem;">
+                        <input type="number" class="kpi-target" data-kpi="ACCESSORIES" placeholder="Target" min="0" step="any" style="flex: 0.8;">
+                        <div class="mtd-controls" id="mtd-ctrl-ACCESSORIES">
+                            <button type="button" class="mtd-btn down" data-kpi="ACCESSORIES" tabindex="-1">▼</button>
+                            <input type="number" class="kpi-mtd" data-kpi="ACCESSORIES" placeholder="MTD" min="0" step="any">
+                            <button type="button" class="mtd-btn up" data-kpi="ACCESSORIES" tabindex="-1">▲</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -473,7 +593,14 @@
                 const isManager = roleSelect.value === 'manager';
                 
                 kpiTargets.forEach(input => input.disabled = !isManager);
-                kpiMtds.forEach(input => input.disabled = isManager);
+                kpiMtds.forEach(input => {
+                    input.disabled = isManager;
+                    const ctrl = document.getElementById(`mtd-ctrl-${input.getAttribute('data-kpi')}`);
+                    if(ctrl) {
+                        if(isManager) ctrl.classList.add('disabled');
+                        else ctrl.classList.remove('disabled');
+                    }
+                });
                 document.getElementById('monthSelect').disabled = !isManager;
                 document.getElementById('resetBtn').style.display = isManager ? 'inline-block' : 'none';
             }
@@ -880,6 +1007,23 @@
             });
             kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
             kpiMtds.forEach(input => input.addEventListener('input', calculateTargets));
+
+            // Listener for the custom MTD stepper buttons
+            document.querySelectorAll('.mtd-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    if (roleSelect.value === 'manager') return; // Disabled in manager mode
+                    
+                    const kpi = e.target.getAttribute('data-kpi');
+                    const input = document.querySelector(`.kpi-mtd[data-kpi="${kpi}"]`);
+                    
+                    let val = parseFloat(input.value) || 0;
+                    if (e.target.classList.contains('up')) val += 1;
+                    else if (e.target.classList.contains('down')) val = Math.max(0, val - 1);
+                    
+                    input.value = val;
+                    calculateTargets();
+                });
+            });
 
             document.getElementById('leaderboardKpiSelect').addEventListener('change', () => {
                 updateLeaderboard();
