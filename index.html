@@ -8,7 +8,7 @@
         :root {
             --primary-color: #4f46e5;
             --bg-color: #f1f5f9;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.75);
             --text-main: #0f172a;
             --text-muted: #475569;
         }
@@ -55,7 +55,9 @@
             width: 100%;
             max-width: 800px;
             animation: slideUpFade 0.6s ease-out forwards;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
         }
 
         .header-container {
@@ -109,14 +111,14 @@
             height: 40px;
             box-sizing: border-box;
             transition: all 0.2s ease;
-            background-color: #f8fafc;
+            background-color: rgba(248, 250, 252, 0.6);
         }
 
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9);
         }
         
         input:disabled, select:disabled {
@@ -134,14 +136,14 @@
             border: 1px solid #e2e8f0;
             border-radius: 6px;
             overflow: hidden;
-            background-color: #f8fafc;
+            background-color: rgba(248, 250, 252, 0.6);
             transition: all 0.2s ease;
             height: 40px;
         }
         .mtd-controls:focus-within {
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.9);
         }
         .mtd-controls input {
             border: none !important;
@@ -160,7 +162,7 @@
             margin: 0;
         }
         .mtd-btn {
-            background: #e2e8f0;
+            background: rgba(226, 232, 240, 0.6);
             border: none;
             color: #475569;
         padding: 0 0.4rem;
@@ -205,10 +207,10 @@
         }
 
         .grid-container > .input-group {
-            background-color: #ffffff;
+            background-color: rgba(255, 255, 255, 0.5);
             padding: 0.75rem;
             border-radius: 12px;
-            border: 1px solid #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.6);
             margin-bottom: 0;
             box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
@@ -220,8 +222,8 @@
         }
 
         .result-box {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
+            background: rgba(255, 255, 255, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             padding: 0.75rem 0.5rem;
             border-radius: 12px;
             text-align: center;
@@ -289,8 +291,8 @@
             align-items: center;
             justify-content: center;
             border-radius: 8px;
-            border: 1px solid #cbd5e1;
-            background-color: white;
+            border: 1px solid rgba(203, 213, 225, 0.6);
+            background-color: rgba(255, 255, 255, 0.6);
             font-size: 0.9rem;
             font-weight: 500;
             cursor: pointer;
@@ -324,7 +326,7 @@
             gap: 0.5rem;
             user-select: none;
             padding: 0.4rem 0.75rem;
-            background-color: #e2e8f0;
+            background-color: rgba(226, 232, 240, 0.6);
             border-radius: 8px;
             transition: background-color 0.2s ease, color 0.2s ease;
         }
@@ -370,7 +372,7 @@
                     <option value="advisor">👤 Advisor</option>
                     <option value="manager">👑 Manager</option>
                 </select>
-                <select id="themeSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid #cbd5e1; font-weight: bold; color: var(--text-muted); background-color: white; cursor: pointer; font-size: 0.75rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                <select id="themeSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid rgba(203, 213, 225, 0.6); font-weight: bold; color: var(--text-muted); background-color: rgba(255, 255, 255, 0.6); cursor: pointer; font-size: 0.75rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                     <option value="blue">🎨 Blue</option>
                     <option value="mint">🎨 Mint</option>
                     <option value="peach">🎨 Peach</option>
@@ -396,7 +398,7 @@
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
         </div>
         
-        <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: #f8fafc; padding: 1rem; border-radius: 12px; border: 1px solid #e2e8f0;">
+        <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: rgba(248, 250, 252, 0.5); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.6);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                 <label id="toggleCalendarBtn" class="calendar-toggle-btn">
                     📅 Working Shifts <span id="calendarIcon" style="font-size: 0.7rem; transition: transform 0.3s ease; display: inline-block; transform: rotate(-90deg);">▼</span>
@@ -415,7 +417,7 @@
                     <!-- JS will populate days here -->
                 </div>
             </div>
-            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: white; padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid #e2e8f0; font-weight: 600;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.85rem; background: rgba(255, 255, 255, 0.6); padding: 0.5rem 1rem; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.6); font-weight: 600;">
                 <div style="color: var(--text-muted)">Days Passed (MTD): <span id="calcDaysPassed" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
                 <div style="color: var(--text-muted)">Remaining Shifts: <span id="calcRemaining" style="color: var(--primary-color); font-size: 1rem;">0</span></div>
             </div>
