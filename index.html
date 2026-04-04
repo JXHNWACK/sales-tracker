@@ -50,30 +50,31 @@
         .calculator-card {
             background-color: var(--card-bg);
             padding: 2rem;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.08), 0 1px 3px rgba(0,0,0,0.04);
             width: 100%;
             max-width: 800px;
             animation: slideUpFade 0.6s ease-out forwards;
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         .header-container {
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .store-badge {
             display: inline-block;
-            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
-            color: var(--primary-color);
+            background-color: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
             padding: 0.35rem 1rem;
             border-radius: 9999px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            margin-bottom: 0.75rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            box-shadow: 0 0 12px rgba(79, 70, 229, 0.4);
         }
 
         h2 {
@@ -90,9 +91,12 @@
 
         label {
             display: block;
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.5rem;
             font-weight: 600;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
 
         input, select {
@@ -111,7 +115,7 @@
         input:focus, select:focus {
             outline: none;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15), 0 0 12px rgba(79, 70, 229, 0.3);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
             background-color: #ffffff;
         }
         
@@ -137,34 +141,33 @@
         }
 
         .grid-container > .input-group {
-            background-color: #f8fafc;
+            background-color: #ffffff;
             padding: 0.75rem;
             border-radius: 12px;
             border: 1px solid #e2e8f0;
             margin-bottom: 0;
-            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.02);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
 
         .results-section {
             margin-top: 1.5rem;
-            border-top: 2px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
             padding-top: 1rem;
         }
 
         .result-box {
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-top: 4px solid var(--primary-color);
             padding: 0.75rem 0.5rem;
             border-radius: 12px;
             text-align: center;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px -1px rgb(0 0 0 / 0.02);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .result-box:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
         }
 
         .result-value {
@@ -280,14 +283,13 @@
             .schedule-section { padding: 0.75rem !important; margin-bottom: 1rem !important; }
             .calendar-day { width: 30px; height: 30px; font-size: 0.85rem; }
             #calendar-days { gap: 0.3rem !important; }
-            .store-badge { padding: 0.25rem 0.75rem; font-size: 0.75rem; margin-bottom: 0.5rem; }
+            .store-badge { padding: 0.25rem 0.75rem; font-size: 0.65rem; margin-bottom: 0.5rem; }
             #advisorImage { width: 36px !important; height: 36px !important; }
             .leaderboard-section { margin-top: 1.5rem !important; padding-top: 1rem !important; }
         }
     </style>
     <!-- Load Chart.js for the Leaderboard -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 </head>
 <body>
 
@@ -405,7 +407,7 @@
             </div>
         </div>
 
-        <div class="leaderboard-section" style="margin-top: 2rem; border-top: 2px solid #e2e8f0; padding-top: 1.5rem;">
+        <div class="leaderboard-section" style="margin-top: 2rem; border-top: 1px solid #e2e8f0; padding-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="margin: 0; color: var(--text-main);">🏆 Team Leaderboard (Run Rate %)</h3>
                 <select id="leaderboardKpiSelect" style="width: auto; height: 34px; padding: 0.25rem 0.5rem; font-weight: bold; color: var(--primary-color);">
@@ -558,9 +560,6 @@
                 monthSelect.value = data.monthSelect || (new Date().getMonth() + 1);
                 currentSchedules = data.schedules ? JSON.parse(JSON.stringify(data.schedules)) : {}; // Deep copy to prevent bugs
 
-                // Reset the confetti trackers when switching advisors
-                document.querySelectorAll('[id^="rr-"]').forEach(el => el.dataset.wasOnTrack = '');
-
                 kpiTargets.forEach(input => {
                     const kpi = input.getAttribute('data-kpi');
                     input.value = data[`target_${kpi}`] !== undefined ? data[`target_${kpi}`] : '';
@@ -710,19 +709,6 @@
                         }
                     }
 
-                    // Trigger confetti if this individual KPI just hit 100%!
-                    if (isCurrentlyOnTrack && rrDisplay.dataset.wasOnTrack !== 'true') {
-                        if (typeof confetti === 'function') {
-                            confetti({
-                                particleCount: 50,
-                                spread: 60,
-                                origin: { y: 0.6 },
-                                zIndex: 9999
-                            });
-                        }
-                    }
-                    rrDisplay.dataset.wasOnTrack = isCurrentlyOnTrack ? 'true' : 'false';
-
                     rrDisplay.style.borderRadius = '6px';
                     rrDisplay.style.padding = '0.1rem 0.4rem';
                     rrDisplay.style.display = 'inline-block';
@@ -759,13 +745,24 @@
 
             function updateLeaderboard() {
                 const kpi = document.getElementById('leaderboardKpiSelect').value;
-                const labels = ["Lucy", "Luiza", "Hamza", "Jibraan", "Pratiksha", "Hayley", "Amirah"];
-                const advisorKeys = ["advisor1", "advisor2", "advisor3", "advisor4", "advisor5", "advisor6", "advisor7"];
                 const currentYear = new Date().getFullYear();
+                
+                const baseAdvisors = [
+                    { name: "Lucy", key: "advisor1" },
+                    { name: "Luiza", key: "advisor2" },
+                    { name: "Hamza", key: "advisor3" },
+                    { name: "Jibraan", key: "advisor4" },
+                    { name: "Pratiksha", key: "advisor5" },
+                    { name: "Hayley", key: "advisor6" },
+                    { name: "Amirah", key: "advisor7" }
+                ];
 
-                const dataPoints = advisorKeys.map(key => {
-                    const advData = allAdvisorsData[key];
-                    if (!advData) return 0;
+                // Calculate the score for everyone
+                const chartData = baseAdvisors.map(adv => {
+                    const advData = allAdvisorsData[adv.key];
+                    let score = 0;
+                    if (!advData) return { name: adv.name, score: 0 };
+                    
                     
                     const target = parseFloat(advData[`target_${kpi}`]) || 0;
                     const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
@@ -786,29 +783,54 @@
 
                     if (mtd > 0 && passed > 0 && target > 0 && daysInMonth > 0) {
                         const projectedTotal = (mtd / passed) * daysInMonth;
-                        return parseFloat(((projectedTotal / target) * 100).toFixed(2));
+                        score = parseFloat(((projectedTotal / target) * 100).toFixed(2));
                     }
-                    return 0;
+                    return { name: adv.name, score: score };
                 });
+
+                // Sort the leaderboard from highest Run Rate to lowest
+                chartData.sort((a, b) => b.score - a.score);
                 
+                const labels = chartData.map(d => d.name);
+                const dataPoints = chartData.map(d => d.score);
                 const bgColors = dataPoints.map(val => val >= 100 ? '#10b981' : '#ef4444');
+                const targetLineData = dataPoints.map(() => 100); // Create a flat line at 100
 
                 if (leaderboardChart) {
+                    leaderboardChart.data.labels = labels;
                     leaderboardChart.data.datasets[0].data = dataPoints;
                     leaderboardChart.data.datasets[0].backgroundColor = bgColors;
+                    if (leaderboardChart.data.datasets[1]) {
+                        leaderboardChart.data.datasets[1].data = targetLineData;
+                    }
                     leaderboardChart.update();
                 } else {
                     const ctx = document.getElementById('leaderboardChart').getContext('2d');
                     leaderboardChart = new Chart(ctx, {
-                        type: 'bar',
                         data: {
                             labels: labels,
-                            datasets: [{
-                                label: 'Run Rate %',
-                                data: dataPoints,
-                                backgroundColor: bgColors,
-                                borderRadius: 6
-                            }]
+                            datasets: [
+                                {
+                                    type: 'bar',
+                                    label: 'Run Rate %',
+                                    data: dataPoints,
+                                    backgroundColor: bgColors,
+                                    borderRadius: 6,
+                                    order: 2
+                                },
+                                {
+                                    type: 'line',
+                                    label: '100% Target',
+                                    data: targetLineData,
+                                    borderColor: '#94a3b8',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    fill: false,
+                                    pointRadius: 0,
+                                    pointHoverRadius: 0,
+                                    order: 1
+                                }
+                            ]
                         },
                         options: {
                             responsive: true,
