@@ -397,7 +397,7 @@
             </div>
             
             <div id="lastSavedDisplay" style="text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
-                Last Saved: <span id="lastSavedTimestamp">Never saved</span>
+                Last Updated: <span id="lastSavedTimestamp">Never saved</span>
             </div>
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
         </div>
@@ -624,6 +624,7 @@
                 saveBtn.style.cursor = isDefault ? 'not-allowed' : 'pointer';
 
                 document.getElementById('dashboardContent').style.display = isDefault ? 'none' : 'block';
+                document.getElementById('lastSavedDisplay').style.display = isDefault ? 'none' : 'block';
                 document.getElementById('welcomeMessage').style.display = isDefault ? 'block' : 'none';
             }
 
@@ -672,6 +673,13 @@
                 saveBtn.style.backgroundColor = '#f59e0b';
                 const currentAdvisor = advisorSelect.value;
                 
+                // Set the timestamp in the data BEFORE saving to the cloud
+                const now = new Date().toISOString();
+                if (currentAdvisor !== 'default') {
+                    if (!allAdvisorsData[currentAdvisor]) allAdvisorsData[currentAdvisor] = {};
+                    allAdvisorsData[currentAdvisor].lastSaved = now;
+                }
+                
                 fetch('/api/data', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -679,10 +687,9 @@
                 }).then(async (res) => {
                     if (res.ok) {
                         saveBtn.textContent = '✅ Saved!';
-                        // Update the last saved timestamp in the data and display
-                        const now = new Date().toISOString();
-                        if (allAdvisorsData[currentAdvisor]) {
-                            allAdvisorsData[currentAdvisor].lastSaved = now;
+                        // Update the visual display immediately upon success
+                        if (currentAdvisor !== 'default') {
+                            lastSavedTimestampSpan.textContent = formatTimestamp(now);
                         }
                         saveBtn.style.backgroundColor = '#059669';
                         setTimeout(() => {
