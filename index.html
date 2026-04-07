@@ -393,9 +393,12 @@
                     <option value="advisor6">👤 Hayley</option>
                     <option value="advisor7">👤 Amirah</option>
                 </select>
-                <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; height: 40px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s;">💾 Save</button>
+                <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; height: 40px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s; flex-shrink: 0;">💾 Save</button>
             </div>
             
+            <div id="lastSavedDisplay" style="text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
+                Last Saved: <span id="lastSavedTimestamp">Never saved</span>
+            </div>
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
         </div>
         
@@ -569,6 +572,7 @@
             const kpiTargets = document.querySelectorAll('.kpi-target');
             const kpiMtds = document.querySelectorAll('.kpi-mtd');
             
+            const lastSavedTimestampSpan = document.getElementById('lastSavedTimestamp');
             const advisorImage = document.getElementById('advisorImage');
             
             // To use custom photos, paste the direct image link (ending in .jpg or .png) between the quotes!
@@ -666,6 +670,7 @@
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.textContent = '⏳ Saving...';
                 saveBtn.style.backgroundColor = '#f59e0b';
+                const currentAdvisor = advisorSelect.value;
                 
                 fetch('/api/data', {
                     method: 'POST',
@@ -674,6 +679,11 @@
                 }).then(async (res) => {
                     if (res.ok) {
                         saveBtn.textContent = '✅ Saved!';
+                        // Update the last saved timestamp in the data and display
+                        const now = new Date().toISOString();
+                        if (allAdvisorsData[currentAdvisor]) {
+                            allAdvisorsData[currentAdvisor].lastSaved = now;
+                        }
                         saveBtn.style.backgroundColor = '#059669';
                         setTimeout(() => {
                             saveBtn.textContent = '💾 Save';
@@ -707,6 +717,18 @@
             
             document.getElementById('saveBtn').addEventListener('click', saveToCloud);
 
+            // Helper function to format timestamp
+            function formatTimestamp(isoString) {
+                if (!isoString) return 'Never saved';
+                const date = new Date(isoString);
+                if (isNaN(date.getTime())) return 'Invalid date';
+
+                const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
+                const formatted = date.toLocaleString('en-GB', options); // en-GB for dd/mm/yyyy
+                // Replace comma with ' at ' for better readability
+                return formatted.replace(', ', ' at ');
+            }
+
             // Function to load a specific advisor's profile into the UI
             function loadAdvisorData(advisorId) {
                 const data = allAdvisorsData[advisorId] || {};
@@ -726,6 +748,8 @@
                 const savedTheme = data.theme || "blue";
                 document.getElementById('themeSelect').value = savedTheme;
                 document.body.style.background = themes[savedTheme];
+
+                lastSavedTimestampSpan.textContent = formatTimestamp(data.lastSaved);
 
                 renderCalendar();
                 calculateTargets();
@@ -811,7 +835,8 @@
                 const advisorData = {
                     monthSelect: monthSelect.value,
                     schedules: currentSchedules,
-                    theme: document.getElementById('themeSelect').value
+                    theme: document.getElementById('themeSelect').value,
+                    lastSaved: allAdvisorsData[currentAdvisor] ? allAdvisorsData[currentAdvisor].lastSaved : undefined // Preserve existing lastSaved or set to undefined
                 };
 
                 kpiTargets.forEach(targetInput => {
@@ -1059,6 +1084,7 @@
                     delete allAdvisorsData[advisorSelect.value];
                     
                     saveToCloud();
+                    lastSavedTimestampSpan.textContent = "Never saved"; // Update display immediately
                     
                     loadAdvisorData(advisorSelect.value);
                 }
