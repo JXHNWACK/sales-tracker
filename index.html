@@ -650,9 +650,8 @@
                 });
                 document.getElementById('monthSelect').disabled = !isManager || isDefault;
                 document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
-            document.getElementById('bulkEditBtn').style.display = isManager ? 'inline-block' : 'none';
-            const bulkBtn = document.getElementById('bulkEditBtn');
-            if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
+                const bulkBtn = document.getElementById('bulkEditBtn');
+                if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -968,6 +967,11 @@
             }
 
             function updateLeaderboard() {
+                if (typeof Chart === 'undefined') {
+                    console.warn("Chart.js failed to load. Skipping leaderboard to prevent the dashboard from crashing.");
+                    return;
+                }
+
                 const kpi = document.getElementById('leaderboardKpiSelect').value;
                 const currentYear = new Date().getFullYear();
                 
