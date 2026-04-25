@@ -651,6 +651,8 @@
                 document.getElementById('monthSelect').disabled = !isManager || isDefault;
                 document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
             document.getElementById('bulkEditBtn').style.display = isManager ? 'inline-block' : 'none';
+            const bulkBtn = document.getElementById('bulkEditBtn');
+            if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -1179,49 +1181,53 @@
             { name: "Amirah", key: "advisor7" }
         ];
 
-        bulkEditBtn.addEventListener('click', () => {
-            bulkEditTableBody.innerHTML = '';
-            
-            baseAdvisorsList.forEach(adv => {
-                const data = allAdvisorsData[adv.key] || {};
-                const tr = document.createElement('tr');
-                tr.style.borderBottom = "1px solid #f1f5f9";
+        if (bulkEditBtn) {
+            bulkEditBtn.addEventListener('click', () => {
+                bulkEditTableBody.innerHTML = '';
                 
-                let html = `<td style="padding: 0.5rem; font-weight: 600; font-size: 0.9rem;">${adv.name}</td>`;
-                kpiList.forEach(kpi => {
-                    const mtdValue = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
-                    html += `<td style="padding: 0.5rem;"><input type="number" class="bulk-input" data-adv="${adv.key}" data-kpi="${kpi}" value="${mtdValue}" min="0" step="any"></td>`;
+                baseAdvisorsList.forEach(adv => {
+                    const data = allAdvisorsData[adv.key] || {};
+                    const tr = document.createElement('tr');
+                    tr.style.borderBottom = "1px solid #f1f5f9";
+                    
+                    let html = `<td style="padding: 0.5rem; font-weight: 600; font-size: 0.9rem;">${adv.name}</td>`;
+                    kpiList.forEach(kpi => {
+                        const mtdValue = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
+                        html += `<td style="padding: 0.5rem;"><input type="number" class="bulk-input" data-adv="${adv.key}" data-kpi="${kpi}" value="${mtdValue}" min="0" step="any"></td>`;
+                    });
+                    
+                    tr.innerHTML = html;
+                    bulkEditTableBody.appendChild(tr);
                 });
                 
-                tr.innerHTML = html;
-                bulkEditTableBody.appendChild(tr);
+                bulkEditModal.style.display = 'flex';
             });
-            
-            bulkEditModal.style.display = 'flex';
-        });
+        }
 
-        closeBulkEdit.addEventListener('click', () => bulkEditModal.style.display = 'none');
-        bulkEditModal.addEventListener('click', (e) => { if(e.target === bulkEditModal) bulkEditModal.style.display = 'none'; });
+        if (closeBulkEdit) closeBulkEdit.addEventListener('click', () => bulkEditModal.style.display = 'none');
+        if (bulkEditModal) bulkEditModal.addEventListener('click', (e) => { if(e.target === bulkEditModal) bulkEditModal.style.display = 'none'; });
 
-        saveBulkEdit.addEventListener('click', () => {
-            const inputs = bulkEditTableBody.querySelectorAll('.bulk-input');
-            inputs.forEach(input => {
-                const advKey = input.getAttribute('data-adv');
-                const kpi = input.getAttribute('data-kpi');
+        if (saveBulkEdit) {
+            saveBulkEdit.addEventListener('click', () => {
+                const inputs = bulkEditTableBody.querySelectorAll('.bulk-input');
+                inputs.forEach(input => {
+                    const advKey = input.getAttribute('data-adv');
+                    const kpi = input.getAttribute('data-kpi');
+                    
+                    if (!allAdvisorsData[advKey]) allAdvisorsData[advKey] = {};
+                    allAdvisorsData[advKey][`mtd_${kpi}`] = input.value;
+                });
                 
-                if (!allAdvisorsData[advKey]) allAdvisorsData[advKey] = {};
-                allAdvisorsData[advKey][`mtd_${kpi}`] = input.value;
+                bulkEditModal.style.display = 'none';
+                
+                // Refresh current UI in the background if an advisor is active
+                if (advisorSelect.value !== 'default') loadAdvisorData(advisorSelect.value);
+                
+                // Save entire team state and refresh leaderboard
+                saveToCloud();
+                updateLeaderboard();
             });
-            
-            bulkEditModal.style.display = 'none';
-            
-            // Refresh current UI in the background if an advisor is active
-            if (advisorSelect.value !== 'default') loadAdvisorData(advisorSelect.value);
-            
-            // Save entire team state and refresh leaderboard
-            saveToCloud();
-            updateLeaderboard();
-        });
+        }
         });
     </script>
 </body>
