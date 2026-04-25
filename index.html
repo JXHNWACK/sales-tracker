@@ -367,8 +367,8 @@
             .grid-container { gap: 0.4rem; }
             .grid-container > .input-group { padding: 0.4rem; }
             .result-box { padding: 0.5rem 0.25rem; }
-            .result-value { font-size: 1rem !important; }
-            .result-label { font-size: 0.7rem; }
+            .result-value { font-size: 0.95rem !important; }
+            .result-label { font-size: 0.65rem; }
             .schedule-section { padding: 0.75rem !important; margin-bottom: 1rem !important; }
             .calendar-day { width: 30px; height: 30px; font-size: 0.85rem; }
             #calendar-days { gap: 0.3rem !important; }
@@ -555,16 +555,16 @@
             </div>
 
         <div class="results-section">
-            <h3 style="text-align: center; margin-top: 0; margin-bottom: 1rem; color: var(--text-main);">Required vs Current Run Rate</h3>
+            <h3 style="text-align: center; margin-top: 0; margin-bottom: 1rem; color: var(--text-main);">Current Targets & Run Rate</h3>
             <div class="grid-container">
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-POINTS"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-CV"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-HBB"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-MBB"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-RET"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-PAYG"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-B2B"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-around;"><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0.00</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-ACCESSORIES"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-POINTS" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-POINTS"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-CV" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-CV"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-HBB" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-HBB"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-MBB" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-MBB"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-RET" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-RET"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-PAYG" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-PAYG"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-B2B" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-B2B"></div></div></div>
+                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-ACCESSORIES" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-ACCESSORIES"></div></div></div>
             </div>
         </div>
 
@@ -911,6 +911,7 @@
                     const resDisplay = document.getElementById(`res-${kpiName}`);
                     const rrDisplay = document.getElementById(`rr-${kpiName}`);
                     const progDisplay = document.getElementById(`prog-${kpiName}`);
+                    const remDisplay = document.getElementById(`rem-${kpiName}`);
                     
                     const target = parseFloat(targetInput.value);
                     const mtd = parseFloat(mtdInput.value) || 0;
@@ -919,10 +920,28 @@
                     advisorData[`target_${kpiName}`] = targetInput.value;
                     advisorData[`mtd_${kpiName}`] = mtdInput.value;
 
+                    // Calculate remaining to hit target
+                    let remainingToHit = 0;
+                    if (!isNaN(target)) {
+                        remainingToHit = Math.max(0, target - mtd);
+                        remainingToHit = Math.round(remainingToHit * 100) / 100; 
+                    }
+                    
+                    if (remDisplay && remDisplay.textContent !== remainingToHit.toString()) {
+                        remDisplay.textContent = remainingToHit;
+                        remDisplay.classList.remove('animate-pop');
+                        void remDisplay.offsetWidth;
+                        remDisplay.classList.add('animate-pop');
+                    }
+
                     // Calculate required per remaining shift
                     let newResText = '0';
-                    if (!isNaN(target) && !isNaN(remaining) && remaining > 0) {
-                        const remainingToHit = Math.max(0, target - mtd);
+                    let isTargetHit = false;
+                    
+                    if (!isNaN(target) && target > 0 && remainingToHit === 0) {
+                        newResText = '✅';
+                        isTargetHit = true;
+                    } else if (!isNaN(target) && !isNaN(remaining) && remaining > 0) {
                         newResText = Math.ceil(remainingToHit / remaining).toString();
                     }
 
@@ -977,7 +996,7 @@
                             if (progressPercent > 100) progressPercent = 100;
                         }
                         progDisplay.style.width = `${progressPercent}%`;
-                        progDisplay.style.backgroundColor = newRrColor; // Match the bar color to the run-rate status (Red/Green)
+                        progDisplay.style.backgroundColor = isTargetHit ? '#eab308' : newRrColor; // Gold if done, else Match run-rate
                     }
                 });
 
@@ -1043,6 +1062,13 @@
                 // Sort the leaderboard from highest Run Rate to lowest
                 chartData.sort((a, b) => b.score - a.score);
                 
+                // Add Medals to the top 3 on the leaderboard
+                chartData.forEach((d, index) => {
+                    if (index === 0 && d.score > 0) d.name = '🥇 ' + d.name;
+                    else if (index === 1 && d.score > 0) d.name = '🥈 ' + d.name;
+                    else if (index === 2 && d.score > 0) d.name = '🥉 ' + d.name;
+                });
+
                 const labels = chartData.map(d => d.name);
                 const dataPoints = chartData.map(d => d.score);
                 const bgColors = dataPoints.map(val => val >= 100 ? '#10b981' : '#ef4444');
