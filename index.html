@@ -165,7 +165,7 @@
             background: rgba(226, 232, 240, 0.6);
             border: none;
             color: #475569;
-        padding: 0 0.4rem;
+            padding: 0 0.4rem;
             cursor: pointer;
             font-size: 0.7rem;
             display: flex;
@@ -565,6 +565,39 @@
         </div>
     </div>
 
+    <!-- Bulk Edit Modal -->
+    <div id="bulkEditModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);">📋 Bulk Edit MTD Figures</h3>
+                <button id="closeBulkEdit" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                            <th style="padding: 0.5rem;">Advisor</th>
+                            <th style="padding: 0.5rem; text-align: center;">POINTS</th>
+                            <th style="padding: 0.5rem; text-align: center;">CV</th>
+                            <th style="padding: 0.5rem; text-align: center;">HBB</th>
+                            <th style="padding: 0.5rem; text-align: center;">MBB</th>
+                            <th style="padding: 0.5rem; text-align: center;">RET</th>
+                            <th style="padding: 0.5rem; text-align: center;">PAYG</th>
+                            <th style="padding: 0.5rem; text-align: center;">B2B</th>
+                            <th style="padding: 0.5rem; text-align: center;">ACC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bulkEditTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button id="saveBulkEdit" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0.6rem 1.5rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s;">💾 Save All</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const advisorSelect = document.getElementById('advisorSelect');
@@ -617,6 +650,7 @@
                 });
                 document.getElementById('monthSelect').disabled = !isManager || isDefault;
                 document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
+            document.getElementById('bulkEditBtn').style.display = isManager ? 'inline-block' : 'none';
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -1126,6 +1160,68 @@
                     kpiIcon.style.transform = 'rotate(-90deg)';
                 }
             });
+
+        // --- BULK EDIT LOGIC ---
+        const bulkEditBtn = document.getElementById('bulkEditBtn');
+        const bulkEditModal = document.getElementById('bulkEditModal');
+        const closeBulkEdit = document.getElementById('closeBulkEdit');
+        const bulkEditTableBody = document.getElementById('bulkEditTableBody');
+        const saveBulkEdit = document.getElementById('saveBulkEdit');
+
+        const kpiList = ["POINTS", "CV", "HBB", "MBB", "RET", "PAYG", "B2B", "ACCESSORIES"];
+        const baseAdvisorsList = [
+            { name: "Lucy", key: "advisor1" },
+            { name: "Luiza", key: "advisor2" },
+            { name: "Hamza", key: "advisor3" },
+            { name: "Jibraan", key: "advisor4" },
+            { name: "Pratiksha", key: "advisor5" },
+            { name: "Hayley", key: "advisor6" },
+            { name: "Amirah", key: "advisor7" }
+        ];
+
+        bulkEditBtn.addEventListener('click', () => {
+            bulkEditTableBody.innerHTML = '';
+            
+            baseAdvisorsList.forEach(adv => {
+                const data = allAdvisorsData[adv.key] || {};
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = "1px solid #f1f5f9";
+                
+                let html = `<td style="padding: 0.5rem; font-weight: 600; font-size: 0.9rem;">${adv.name}</td>`;
+                kpiList.forEach(kpi => {
+                    const mtdValue = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
+                    html += `<td style="padding: 0.5rem;"><input type="number" class="bulk-input" data-adv="${adv.key}" data-kpi="${kpi}" value="${mtdValue}" min="0" step="any"></td>`;
+                });
+                
+                tr.innerHTML = html;
+                bulkEditTableBody.appendChild(tr);
+            });
+            
+            bulkEditModal.style.display = 'flex';
+        });
+
+        closeBulkEdit.addEventListener('click', () => bulkEditModal.style.display = 'none');
+        bulkEditModal.addEventListener('click', (e) => { if(e.target === bulkEditModal) bulkEditModal.style.display = 'none'; });
+
+        saveBulkEdit.addEventListener('click', () => {
+            const inputs = bulkEditTableBody.querySelectorAll('.bulk-input');
+            inputs.forEach(input => {
+                const advKey = input.getAttribute('data-adv');
+                const kpi = input.getAttribute('data-kpi');
+                
+                if (!allAdvisorsData[advKey]) allAdvisorsData[advKey] = {};
+                allAdvisorsData[advKey][`mtd_${kpi}`] = input.value;
+            });
+            
+            bulkEditModal.style.display = 'none';
+            
+            // Refresh current UI in the background if an advisor is active
+            if (advisorSelect.value !== 'default') loadAdvisorData(advisorSelect.value);
+            
+            // Save entire team state and refresh leaderboard
+            saveToCloud();
+            updateLeaderboard();
+        });
         });
     </script>
 </body>
