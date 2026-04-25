@@ -268,6 +268,26 @@
             transform: scale(0.95);
         }
         
+        .btn-bulk {
+            background-color: #dbeafe;
+            color: #2563eb;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .btn-bulk:hover {
+            background-color: #bfdbfe;
+        }
+        .btn-bulk:active {
+            transform: scale(0.95);
+        }
+        
         .progress-container {
             width: 100%;
             height: 6px;
@@ -400,6 +420,7 @@
                 Last Updated: <span id="lastSavedTimestamp">Never saved</span>
             </div>
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
+            <button id="bulkEditBtn" class="btn-bulk" style="display: none;">📋 Bulk Edit MTD</button>
         </div>
         
         <div id="welcomeMessage" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
