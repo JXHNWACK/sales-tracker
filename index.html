@@ -49,6 +49,15 @@
         .animate-pop {
             animation: popNumber 0.3s ease-out;
         }
+        
+        @keyframes flashUpdate {
+            0% { color: #10b981; font-weight: bold; text-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+            20% { color: #10b981; font-weight: bold; }
+            100% { color: var(--text-muted); font-weight: normal; text-shadow: none; }
+        }
+        .flash-update {
+            animation: flashUpdate 2s ease-out;
+        }
 
         .calculator-card {
             background-color: var(--card-bg);
@@ -996,6 +1005,9 @@
                         // Update the visual display immediately upon success
                         if (currentAdvisor !== 'default') {
                             lastSavedTimestampSpan.textContent = formatTimestamp(now);
+                            lastSavedTimestampSpan.classList.remove('flash-update');
+                            void lastSavedTimestampSpan.offsetWidth; // Trigger reflow to restart animation
+                            lastSavedTimestampSpan.classList.add('flash-update');
                         }
                         saveBtn.style.backgroundColor = '#059669';
                         setTimeout(() => {
@@ -1036,10 +1048,22 @@
                 const date = new Date(isoString);
                 if (isNaN(date.getTime())) return 'Invalid date';
 
-                const options = { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false };
-                const formatted = date.toLocaleString('en-GB', options); // en-GB for dd/mm/yyyy
-                // Replace comma with ' at ' for better readability
-                return formatted.replace(', ', ' at ');
+                const now = new Date();
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                const yesterday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+                
+                const timeOptions = { hour: 'numeric', minute: '2-digit', hour12: true };
+                const timeString = date.toLocaleTimeString('en-US', timeOptions); // en-US gives clean AM/PM
+
+                if (date >= today) {
+                    return `Today at ${timeString}`;
+                } else if (date >= yesterday) {
+                    return `Yesterday at ${timeString}`;
+                } else {
+                    const dateOptions = { day: '2-digit', month: '2-digit', year: 'numeric' };
+                    const dateString = date.toLocaleDateString('en-GB', dateOptions);
+                    return `${dateString} at ${timeString}`;
+                }
             }
 
             // Function to load a specific advisor's profile into the UI
@@ -1511,12 +1535,14 @@
         if (saveBulkEdit) {
             saveBulkEdit.addEventListener('click', () => {
                 const inputs = bulkEditTableBody.querySelectorAll('.bulk-input');
+                const now = new Date().toISOString();
                 inputs.forEach(input => {
                     const advKey = input.getAttribute('data-adv');
                     const kpi = input.getAttribute('data-kpi');
                     
                     if (!allAdvisorsData[advKey]) allAdvisorsData[advKey] = {};
                     allAdvisorsData[advKey][`mtd_${kpi}`] = input.value;
+                    allAdvisorsData[advKey].lastSaved = now;
                 });
                 
                 bulkEditModal.style.display = 'none';
