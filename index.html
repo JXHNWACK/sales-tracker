@@ -811,6 +811,9 @@
                 <h3 style="margin: 0; color: var(--text-main);">📋 Bulk Edit MTD Figures</h3>
                 <button id="closeBulkEdit" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
             </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); background: #f8fafc; padding: 0.75rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                💡 <strong>Smart Paste:</strong> You can copy the <strong>entire Store Report</strong> straight from Excel! Just highlight your team's rows, copy, click into any box below, and press Paste (<code>Ctrl+V</code>). The app will automatically find the right advisors and extract the 8 KPIs.
+            </div>
             <div style="overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
                     <thead>
@@ -1629,6 +1632,78 @@
                 // Save entire team state and refresh leaderboard
                 saveToCloud();
                 updateLeaderboard();
+            });
+        }
+
+        // --- EXCEL PASTE SUPPORT FOR BULK EDIT ---
+        if (bulkEditTableBody) {
+            bulkEditTableBody.addEventListener('paste', (e) => {
+                const target = e.target;
+                // Only proceed if the user is pasting into one of our bulk input boxes
+                if (!target.classList.contains('bulk-input')) return;
+
+                e.preventDefault(); // Stop the default single-box paste
+                const pasteData = (e.clipboardData || window.clipboardData).getData('text');
+                
+                // Split by rows (newlines)
+                const rows = pasteData.split(/\r?\n/);
+                
+                // Find exactly where the user clicked to start the paste
+                const startTr = target.closest('tr');
+                const startTd = target.closest('td');
+                const tbody = startTr.parentElement;
+                const startRowIdx = Array.from(tbody.children).indexOf(startTr);
+                const startCellIdx = Array.from(startTr.children).indexOf(startTd);
+
+                let currentRowOffset = 0;
+
+                rows.forEach((row) => {
+                    if (!row.trim()) return; // Skip empty rows at the end
+                    const cells = row.split('\t'); // Split by columns (tabs)
+                    
+                    // Magic detection: The Master Report has ~64 columns. If >30, it's the master report.
+                    const isMasterReport = cells.length > 30;
+
+                    if (isMasterReport) {
+                        // SMART PASTE: Find row by Advisor Name
+                        const excelName = (cells[0] || "").toLowerCase();
+                        const targetRow = Array.from(tbody.children).find(tr => {
+                            const appName = tr.children[0].textContent.trim().toLowerCase();
+                            // Special fallback mapping (e.g. Excel says Iuliana, App says Luiza)
+                            return excelName.includes(appName) || (appName === 'luiza' && excelName.includes('iuliana'));
+                        });
+
+                        if (targetRow) {
+                            const inputs = targetRow.querySelectorAll('input.bulk-input');
+                            // Exact column indices from your Excel sheet for: POINTS, CV, HBB, MBB, RET, PAYG, B2B, ACC
+                            const mappedIndices = [2, 6, 18, 23, 28, 36, 41, 59];
+                            
+                            mappedIndices.forEach((colIdx, i) => {
+                                const cellValue = cells[colIdx];
+                                if (cellValue !== undefined && inputs[i]) {
+                                    const cleanNum = parseFloat(cellValue.replace(/,/g, '').trim());
+                                    if (!isNaN(cleanNum)) inputs[i].value = cleanNum;
+                                }
+                            });
+                        }
+                    } else {
+                        // STANDARD PASTE: Block or Column copy
+                        const targetRow = tbody.children[startRowIdx + currentRowOffset];
+                        if (targetRow) {
+                            cells.forEach((cellValue, cellIdx) => {
+                                const targetCell = targetRow.children[startCellIdx + cellIdx];
+                                if (targetCell) {
+                                    const input = targetCell.querySelector('input.bulk-input');
+                                    if (input) {
+                                        const cleanNum = parseFloat(cellValue.replace(/,/g, '').trim());
+                                        if (!isNaN(cleanNum)) input.value = cleanNum;
+                                    }
+                                }
+                            });
+                        }
+                        currentRowOffset++;
+                    }
+                });
             });
         }
 
