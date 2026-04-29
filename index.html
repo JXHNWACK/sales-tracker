@@ -227,15 +227,18 @@
         .result-box {
             background: rgba(255, 255, 255, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.6);
-            padding: 0.75rem 0.5rem;
+            padding: 1rem 0.75rem;
             border-radius: 12px;
-            text-align: center;
+            text-align: left;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.02), 0 2px 4px -1px rgb(0 0 0 / 0.02);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
 
         .result-box:hover {
-            transform: translateY(-2px);
+            transform: translateY(-3px);
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.05);
         }
 
@@ -382,8 +385,8 @@
             .header-container { margin-bottom: 1rem; }
             .grid-container { gap: 0.4rem; }
             .grid-container > .input-group { padding: 0.4rem; }
-            .result-box { padding: 0.5rem 0.25rem; }
-            .result-value { font-size: 0.95rem !important; }
+            .result-box { padding: 0.75rem; }
+            .result-value { font-size: 1.1rem; }
             .result-label { font-size: 0.65rem; }
             .schedule-section { padding: 0.75rem !important; margin-bottom: 1rem !important; }
             .calendar-day { width: 30px; height: 30px; font-size: 0.85rem; }
@@ -574,14 +577,206 @@
         <div class="results-section">
             <h3 style="text-align: center; margin-top: 0; margin-bottom: 1rem; color: var(--text-main);">Current Targets & Run Rate</h3>
             <div class="grid-container">
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">POINTS</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-POINTS" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-POINTS" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-POINTS" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-POINTS"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">CV</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-CV" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-CV" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-CV" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-CV"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">HBB</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-HBB" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-HBB" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-HBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-HBB"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">MBB</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-MBB" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-MBB" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-MBB" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-MBB"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">RET</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-RET" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-RET" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-RET" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-RET"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">PAYG</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-PAYG" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-PAYG" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-PAYG" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-PAYG"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">B2B</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-B2B" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-B2B" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-B2B" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-B2B"></div></div></div>
-                <div class="result-box"><div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.25rem;">ACCESSORIES</div><div style="display: flex; justify-content: space-between; padding: 0 0.1rem;"><div><div class="result-value" id="rem-ACCESSORIES" style="font-size: 1.1rem;">0</div><div class="result-label">Remaining</div></div><div><div class="result-value" id="res-ACCESSORIES" style="font-size: 1.1rem;">0</div><div class="result-label">Per Shift</div></div><div><div class="result-value" id="rr-ACCESSORIES" style="font-size: 1.1rem; color: #059669;">0.00%</div><div class="result-label">Run Rate</div></div></div><div class="progress-container"><div class="progress-fill" id="prog-ACCESSORIES"></div></div></div>
+                <!-- POINTS -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">POINTS</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-POINTS">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-POINTS">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-POINTS" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-POINTS"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- CV -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">CV</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-CV">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-CV">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-CV" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-CV"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- HBB -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">HBB</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-HBB">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-HBB">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-HBB" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-HBB"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- MBB -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">MBB</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-MBB">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-MBB">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-MBB" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-MBB"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- RET -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">RET</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-RET">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-RET">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-RET" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-RET"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- PAYG -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">PAYG</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-PAYG">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-PAYG">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-PAYG" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-PAYG"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- B2B -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">B2B</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-B2B">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-B2B">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-B2B" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-B2B"></div>
+                        </div>
+                    </div>
+                </div>
+                <!-- ACCESSORIES -->
+                <div class="result-box">
+                    <div>
+                        <div style="font-weight: 600; font-size: 0.85rem; margin-bottom: 0.5rem;">ACCESSORIES</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 0.75rem; text-align: center;">
+                            <div>
+                                <div class="result-value" id="rem-ACCESSORIES">0</div>
+                                <div class="result-label">Remaining</div>
+                            </div>
+                            <div>
+                                <div class="result-value" id="res-ACCESSORIES">0</div>
+                                <div class="result-label">Per Shift</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                            <span class="result-label" style="font-weight: 600;">Run Rate</span>
+                            <span id="rr-ACCESSORIES" style="font-weight: 700; font-size: 0.9rem;">0.00%</span>
+                        </div>
+                        <div class="progress-container">
+                            <div class="progress-fill" id="prog-ACCESSORIES"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
