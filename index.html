@@ -423,13 +423,7 @@
                     <option value="advisor">👤 Advisor</option>
                     <option value="manager">👑 Manager</option>
                 </select>
-                <select id="themeSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border: 1px solid rgba(203, 213, 225, 0.6); font-weight: bold; color: var(--text-muted); background-color: rgba(255, 255, 255, 0.6); cursor: pointer; font-size: 0.75rem; text-align: center; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
-                    <option value="blue">🎨 Blue</option>
-                    <option value="mint">🎨 Mint</option>
-                    <option value="peach">🎨 Peach</option>
-                    <option value="purple">🎨 Purple</option>
-                    <option value="pink">🎨 Pink</option>
-                </select>
+                <button id="openCustomizeBtn" style="display: none; width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; border: 1px solid rgba(203, 213, 225, 0.6); font-weight: bold; color: var(--text-muted); background-color: rgba(255, 255, 255, 0.6); cursor: pointer; font-size: 0.75rem; align-items: center; gap: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">🎨 Customize</button>
             </div>
             
             <div class="input-group" style="max-width: 400px; margin: 1.5rem auto 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
@@ -843,6 +837,46 @@
         </div>
     </div>
 
+    <!-- Customize Modal -->
+    <div id="customizeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; width: 90%; max-width: 350px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0; color: var(--text-main);">🎨 Customise App</h3>
+                <button id="closeCustomize" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            
+            <div class="input-group" style="margin-bottom: 1rem;">
+                <label>Font Style</label>
+                <select id="customFontSelect" style="background-color: #f8fafc;">
+                    <option value="default">Modern (Default)</option>
+                    <option value="serif">Classic (Serif)</option>
+                    <option value="mono">Typewriter (Monospace)</option>
+                    <option value="playful">Playful (Rounded)</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
+                <label style="margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Accent Colour</label>
+                <input type="color" id="customPrimaryColor" value="#4f46e5" style="width: 45px; height: 35px; padding: 0; cursor: pointer; border: none; background: none;">
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding: 0.5rem 0; border-bottom: 1px solid #f1f5f9;">
+                <label style="margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Background Colour</label>
+                <input type="color" id="customBgColor" value="#e0e7ff" style="width: 45px; height: 35px; padding: 0; cursor: pointer; border: none; background: none;">
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding: 0.5rem 0;">
+                <label style="margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">Text Colour</label>
+                <input type="color" id="customTextColor" value="#0f172a" style="width: 45px; height: 35px; padding: 0; cursor: pointer; border: none; background: none;">
+            </div>
+            
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <button id="resetThemeBtn" style="background: none; border: none; color: #ef4444; font-size: 0.8rem; cursor: pointer; text-decoration: underline; padding: 0;">Reset Defaults</button>
+                <button id="doneCustomizeBtn" style="background-color: var(--primary-color); color: white; border: none; border-radius: 6px; padding: 0.5rem 1.5rem; font-weight: bold; cursor: pointer;">Done</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Team Summary Modal -->
     <div id="teamSummaryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
         <div style="background: white; padding: 1.5rem; border-radius: 12px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
@@ -898,12 +932,11 @@
                 "advisor7": "https://ui-avatars.com/api/?name=AB&background=e0e7ff&color=4f46e5&rounded=true"     // <-- Replace this link for Amirah
             };
             
-            const themes = {
-                "blue": "linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%)",
-                "mint": "linear-gradient(135deg, #d1fae5 0%, #f0fdf4 100%)",
-                "peach": "linear-gradient(135deg, #ffedd5 0%, #fff7ed 100%)",
-                "purple": "linear-gradient(135deg, #f3e8ff 0%, #f8fafc 100%)",
-                "pink": "linear-gradient(135deg, #fce7f3 0%, #fff1f2 100%)"
+            const fonts = {
+                "default": '-apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", Arial, sans-serif',
+                "serif": 'Georgia, "Times New Roman", serif',
+                "mono": '"Courier New", Courier, monospace',
+                "playful": '"Comic Sans MS", "Chalkboard SE", "Marker Felt", sans-serif'
             };
 
             let allAdvisorsData = {}; // Will hold data for all 7 advisors
@@ -916,6 +949,8 @@
             function applyRolePermissions() {
                 const isManager = roleSelect.value === 'manager';
                 const isDefault = advisorSelect.value === 'default';
+                
+                document.getElementById('openCustomizeBtn').style.display = isDefault ? 'none' : 'flex';
                 
                 kpiTargets.forEach(input => input.disabled = !isManager || isDefault);
                 kpiMtds.forEach(input => {
@@ -1082,9 +1117,22 @@
                     input.value = data[`mtd_${kpi}`] !== undefined ? data[`mtd_${kpi}`] : '';
                 });
 
-                const savedTheme = data.theme || "blue";
-                document.getElementById('themeSelect').value = savedTheme;
-                document.body.style.background = themes[savedTheme];
+                // Apply Custom Styles
+                const fontStr = data.customFont || "default";
+                document.body.style.fontFamily = fonts[fontStr] || fonts["default"];
+                document.getElementById('customFontSelect').value = fontStr;
+                
+                const primaryCol = data.customPrimary || "#4f46e5";
+                document.documentElement.style.setProperty('--primary-color', primaryCol);
+                document.getElementById('customPrimaryColor').value = primaryCol;
+                
+                const bgCol = data.customBg || "#e0e7ff";
+                document.body.style.background = (bgCol === "#e0e7ff") ? "linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%)" : bgCol;
+                document.getElementById('customBgColor').value = bgCol;
+                
+                const textCol = data.customText || "#0f172a";
+                document.documentElement.style.setProperty('--text-main', textCol);
+                document.getElementById('customTextColor').value = textCol;
 
                 lastSavedTimestampSpan.textContent = formatTimestamp(data.lastSaved);
 
@@ -1172,7 +1220,10 @@
                 const advisorData = {
                     monthSelect: monthSelect.value,
                     schedules: currentSchedules,
-                    theme: document.getElementById('themeSelect').value,
+                    customFont: document.getElementById('customFontSelect').value,
+                    customPrimary: document.getElementById('customPrimaryColor').value,
+                    customBg: document.getElementById('customBgColor').value,
+                    customText: document.getElementById('customTextColor').value,
                     lastSaved: allAdvisorsData[currentAdvisor] ? allAdvisorsData[currentAdvisor].lastSaved : undefined // Preserve existing lastSaved or set to undefined
                 };
 
@@ -1417,10 +1468,35 @@
                 renderCalendar();
                 calculateTargets();
             });
-            document.getElementById('themeSelect').addEventListener('change', () => {
-                document.body.style.background = themes[document.getElementById('themeSelect').value];
-                calculateTargets();
+
+            // --- CUSTOMIZATION LOGIC ---
+            const customizeModal = document.getElementById('customizeModal');
+            document.getElementById('openCustomizeBtn').addEventListener('click', () => customizeModal.style.display = 'flex');
+            document.getElementById('closeCustomize').addEventListener('click', () => customizeModal.style.display = 'none');
+            document.getElementById('doneCustomizeBtn').addEventListener('click', () => customizeModal.style.display = 'none');
+            
+            const applyCustomizations = () => {
+                if(advisorSelect.value === 'default') return;
+                const bgCol = document.getElementById('customBgColor').value;
+                document.body.style.fontFamily = fonts[document.getElementById('customFontSelect').value] || fonts['default'];
+                document.documentElement.style.setProperty('--primary-color', document.getElementById('customPrimaryColor').value);
+                document.body.style.background = (bgCol === "#e0e7ff") ? "linear-gradient(135deg, #e0e7ff 0%, #f1f5f9 100%)" : bgCol;
+                document.documentElement.style.setProperty('--text-main', document.getElementById('customTextColor').value);
+                calculateTargets(); // Save to data object
+            };
+            
+            ['customFontSelect', 'customPrimaryColor', 'customBgColor', 'customTextColor'].forEach(id => {
+                document.getElementById(id).addEventListener('input', applyCustomizations);
             });
+            
+            document.getElementById('resetThemeBtn').addEventListener('click', () => {
+                document.getElementById('customFontSelect').value = 'default';
+                document.getElementById('customPrimaryColor').value = '#4f46e5';
+                document.getElementById('customBgColor').value = '#e0e7ff';
+                document.getElementById('customTextColor').value = '#0f172a';
+                applyCustomizations();
+            });
+
             kpiTargets.forEach(input => input.addEventListener('input', calculateTargets));
             kpiMtds.forEach(input => input.addEventListener('input', calculateTargets));
 
