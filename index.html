@@ -1345,6 +1345,9 @@
             teamSummaryBtn.addEventListener('click', () => {
                 teamSummaryTableBody.innerHTML = '';
                 
+                const storeTotals = {};
+                kpiList.forEach(kpi => storeTotals[kpi] = { mtd: 0, target: 0 });
+                
                 baseAdvisorsList.forEach(adv => {
                     const data = allAdvisorsData[adv.key] || {};
                     const tr = document.createElement('tr');
@@ -1354,6 +1357,9 @@
                         const mtd = parseFloat(data[`mtd_${kpi}`]) || 0;
                         const target = parseFloat(data[`target_${kpi}`]) || 0;
                         let cellText = '<span style="color: #cbd5e1;">-</span>';
+                        
+                        storeTotals[kpi].mtd += mtd;
+                        storeTotals[kpi].target += target;
                         
                         if (target > 0) {
                             let remaining = Math.max(0, target - mtd);
@@ -1382,6 +1388,59 @@
                     teamSummaryTableBody.appendChild(tr);
                 });
                 
+                // --- STORE TOTAL ROW ---
+                const storeTr = document.createElement('tr');
+                storeTr.style.backgroundColor = '#f8fafc';
+                storeTr.style.borderTop = '2px solid #cbd5e1';
+                let storeHtml = `<td style="padding: 0.75rem; font-weight: 800; color: var(--primary-color);">🏢 STORE TOTAL</td>`;
+
+                // Calculate calendar days left in the selected month
+                const currentYear = new Date().getFullYear();
+                const month = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10);
+                const daysInMonth = new Date(currentYear, month, 0).getDate();
+                const todayDate = new Date();
+                todayDate.setHours(0,0,0,0);
+                let daysLeft = 0;
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const d = new Date(currentYear, month - 1, i);
+                    d.setHours(0,0,0,0);
+                    if (d >= todayDate) daysLeft++;
+                }
+
+                kpiList.forEach(kpi => {
+                    const mtd = Math.round(storeTotals[kpi].mtd * 100) / 100;
+                    const target = Math.round(storeTotals[kpi].target * 100) / 100;
+                    let cellText = '<span style="color: #cbd5e1;">-</span>';
+
+                    if (target > 0) {
+                        let remaining = Math.max(0, target - mtd);
+                        remaining = Math.round(remaining * 100) / 100;
+                        let remText = remaining === 0 ? '✅ Hit' : `Left: ${remaining}`;
+                        let remColor = remaining === 0 ? '#10b981' : '#ef4444';
+                        
+                        let needPerDayText = '';
+                        if (remaining > 0 && daysLeft > 0) {
+                            let needPerDay = Math.ceil(remaining / daysLeft);
+                            needPerDayText = `<div style="font-size: 0.65rem; font-weight: 700; color: #d97706; margin-top: 0.2rem; background: #fef3c7; display: inline-block; padding: 0.1rem 0.3rem; border-radius: 4px;">Need ${needPerDay}/day</div>`;
+                        }
+
+                        cellText = `
+                            <div style="font-weight: 800; color: var(--primary-color); font-size: 1.05rem;">
+                                ${mtd} <span style="font-weight: 600; font-size: 0.75rem; color: #64748b;">/ ${target}</span>
+                            </div>
+                            <div style="font-size: 0.75rem; font-weight: 700; color: ${remColor}; margin-top: 0.1rem;">
+                                ${remText}
+                            </div>
+                            ${needPerDayText}
+                        `;
+                    } else if (mtd > 0) {
+                        cellText = `<div style="font-weight: 800; color: var(--primary-color); font-size: 1.05rem;">${mtd}</div>`;
+                    }
+                    storeHtml += `<td style="padding: 0.75rem; text-align: center; vertical-align: middle;">${cellText}</td>`;
+                });
+                storeTr.innerHTML = storeHtml;
+                teamSummaryTableBody.appendChild(storeTr);
+                
                 teamSummaryModal.style.display = 'flex';
             });
         }
@@ -1393,10 +1452,12 @@
         // Register Service Worker for PWA support
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js').then(registration => {
-                    console.log('ServiceWorker registration successful');
-                }).catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
+                // Clear old PWA caches and force an update to the newest version
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                    navigator.serviceWorker.register('/sw.js');
                 });
             });
         }
