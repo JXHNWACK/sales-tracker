@@ -291,6 +291,22 @@
             transform: scale(0.95);
         }
         
+        .btn-summary {
+            background-color: #f3e8ff;
+            color: #7e22ce;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .btn-summary:hover { background-color: #e9d5ff; }
+        .btn-summary:active { transform: scale(0.95); }
+        
         .progress-container {
             width: 100%;
             height: 6px;
@@ -424,6 +440,7 @@
             </div>
             <button id="resetBtn" class="btn-reset">↻ Reset Current Advisor</button>
             <button id="bulkEditBtn" class="btn-bulk" style="display: none;">📋 Bulk Edit MTD</button>
+            <button id="teamSummaryBtn" class="btn-summary" style="display: none;">📸 Team Summary</button>
         </div>
         
         <div id="welcomeMessage" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
@@ -622,6 +639,39 @@
         </div>
     </div>
 
+    <!-- Team Summary Modal -->
+    <div id="teamSummaryModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);">📸 Team KPI Summary</h3>
+                <button id="closeTeamSummary" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left; min-width: 600px;">
+                    <thead>
+                        <tr style="border-bottom: 2px solid #e2e8f0; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">
+                            <th style="padding: 0.5rem;">Advisor</th>
+                            <th style="padding: 0.5rem; text-align: center;">POINTS</th>
+                            <th style="padding: 0.5rem; text-align: center;">CV</th>
+                            <th style="padding: 0.5rem; text-align: center;">HBB</th>
+                            <th style="padding: 0.5rem; text-align: center;">MBB</th>
+                            <th style="padding: 0.5rem; text-align: center;">RET</th>
+                            <th style="padding: 0.5rem; text-align: center;">PAYG</th>
+                            <th style="padding: 0.5rem; text-align: center;">B2B</th>
+                            <th style="padding: 0.5rem; text-align: center;">ACC</th>
+                        </tr>
+                    </thead>
+                    <tbody id="teamSummaryTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                💡 Tip: Take a screenshot of this table to share with the team!
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const advisorSelect = document.getElementById('advisorSelect');
@@ -676,6 +726,8 @@
                 document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
                 const bulkBtn = document.getElementById('bulkEditBtn');
                 if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
+                const summaryBtn = document.getElementById('teamSummaryBtn');
+                if (summaryBtn) summaryBtn.style.display = isManager ? 'inline-block' : 'none';
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -1282,6 +1334,60 @@
                 updateLeaderboard();
             });
         }
+
+        // --- TEAM SUMMARY LOGIC ---
+        const teamSummaryBtn = document.getElementById('teamSummaryBtn');
+        const teamSummaryModal = document.getElementById('teamSummaryModal');
+        const closeTeamSummary = document.getElementById('closeTeamSummary');
+        const teamSummaryTableBody = document.getElementById('teamSummaryTableBody');
+
+        if (teamSummaryBtn) {
+            teamSummaryBtn.addEventListener('click', () => {
+                teamSummaryTableBody.innerHTML = '';
+                
+                baseAdvisorsList.forEach(adv => {
+                    const data = allAdvisorsData[adv.key] || {};
+                    const tr = document.createElement('tr');
+                    
+                    let html = `<td style="padding: 0.75rem; font-weight: 600; border-bottom: 1px solid #f1f5f9;">${adv.name}</td>`;
+                    kpiList.forEach(kpi => {
+                        const mtd = parseFloat(data[`mtd_${kpi}`]) || 0;
+                        const target = parseFloat(data[`target_${kpi}`]) || 0;
+                        let cellText = '<span style="color: #cbd5e1;">-</span>';
+                        
+                        if (target > 0) {
+                            let remaining = Math.max(0, target - mtd);
+                            remaining = Math.round(remaining * 100) / 100; // clean decimals
+                            let remText = remaining === 0 ? '✅ Done' : `Left: ${remaining}`;
+                            let remColor = remaining === 0 ? '#10b981' : '#ef4444';
+                            
+                            cellText = `
+                                <div style="font-weight: bold; color: var(--text-main); font-size: 0.95rem;">
+                                    ${mtd} <span style="font-weight: normal; font-size: 0.75rem; color: var(--text-muted);">/ ${target}</span>
+                                </div>
+                                <div style="font-size: 0.7rem; font-weight: 600; color: ${remColor}; margin-top: 0.1rem;">
+                                    ${remText}
+                                </div>
+                            `;
+                        } else if (mtd > 0) {
+                            cellText = `
+                                <div style="font-weight: bold; color: var(--text-main); font-size: 0.95rem;">${mtd}</div>
+                            `;
+                        }
+                        
+                        html += `<td style="padding: 0.75rem; text-align: center; border-bottom: 1px solid #f1f5f9; vertical-align: middle;">${cellText}</td>`;
+                    });
+                    
+                    tr.innerHTML = html;
+                    teamSummaryTableBody.appendChild(tr);
+                });
+                
+                teamSummaryModal.style.display = 'flex';
+            });
+        }
+
+        if (closeTeamSummary) closeTeamSummary.addEventListener('click', () => teamSummaryModal.style.display = 'none');
+        if (teamSummaryModal) teamSummaryModal.addEventListener('click', (e) => { if(e.target === teamSummaryModal) teamSummaryModal.style.display = 'none'; });
         });
 
         // Register Service Worker for PWA support
