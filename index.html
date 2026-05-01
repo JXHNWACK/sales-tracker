@@ -913,6 +913,25 @@
         </div>
     </div>
 
+    <!-- Store Targets Modal -->
+    <div id="storeTargetsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: white; padding: 1.5rem; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);">🎯 Monthly Store Targets</h3>
+                <button id="closeStoreTargets" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-muted); background: #f8fafc; padding: 0.75rem; border-radius: 8px; border: 1px solid #e2e8f0;">
+                💡 Set the overall store targets for <strong><span id="storeTargetMonthName">this month</span></strong>. The app will calculate the required daily average.
+            </div>
+            <div class="grid-container" id="storeTargetsGrid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+                <!-- Populated by JS -->
+            </div>
+            <div style="margin-top: 1.5rem; text-align: right;">
+                <button id="saveStoreTargets" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0.6rem 1.5rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s;">💾 Save Targets</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const advisorSelect = document.getElementById('advisorSelect');
