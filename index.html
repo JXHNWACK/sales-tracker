@@ -1802,10 +1802,11 @@
                 kpiList.forEach(kpi => {
                     const mtd = Math.round(storeTotals[kpi].mtd * 100) / 100;
                     const explicitStoreTarget = parseFloat(storeData[`target_${kpi}`]);
-                    const target = !isNaN(explicitStoreTarget) && explicitStoreTarget > 0 ? explicitStoreTarget : Math.round(storeTotals[kpi].target * 100) / 100;
+                    const hasTarget = !isNaN(explicitStoreTarget) && explicitStoreTarget > 0;
                     let cellText = '<span style="color: #cbd5e1;">-</span>';
 
-                    if (target > 0) {
+                    if (hasTarget) {
+                        const target = explicitStoreTarget;
                         let remaining = Math.max(0, target - mtd);
                         remaining = Math.round(remaining * 100) / 100;
                         let remText = remaining === 0 ? '✅ Hit' : `Left: ${remaining}`;
@@ -1826,8 +1827,11 @@
                             </div>
                             ${needPerDayText}
                         `;
-                    } else if (mtd > 0) {
-                        cellText = `<div style="font-weight: 800; color: var(--primary-color); font-size: 1.05rem;">${mtd}</div>`;
+                    } else {
+                        cellText = `
+                            <div style="font-weight: 800; color: var(--primary-color); font-size: 1.05rem;">${mtd > 0 ? mtd : 0}</div>
+                            <div style="font-size: 0.65rem; font-weight: 600; color: #94a3b8; margin-top: 0.2rem; background: #f1f5f9; display: inline-block; padding: 0.1rem 0.3rem; border-radius: 4px;">No target set</div>
+                        `;
                     }
                     storeHtml += `<td style="padding: 0.75rem; text-align: center; vertical-align: middle;">${cellText}</td>`;
                 });
