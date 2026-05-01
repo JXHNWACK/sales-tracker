@@ -1720,6 +1720,7 @@
                 const storeTotals = {};
                 kpiList.forEach(kpi => storeTotals[kpi] = { mtd: 0, target: 0 });
                 
+                const storeData = allAdvisorsData['store'] || {};
                 baseAdvisorsList.forEach(adv => {
                     const data = allAdvisorsData[adv.key] || {};
                     const tr = document.createElement('tr');
@@ -1781,7 +1782,8 @@
 
                 kpiList.forEach(kpi => {
                     const mtd = Math.round(storeTotals[kpi].mtd * 100) / 100;
-                    const target = Math.round(storeTotals[kpi].target * 100) / 100;
+                    const explicitStoreTarget = parseFloat(storeData[`target_${kpi}`]);
+                    const target = !isNaN(explicitStoreTarget) && explicitStoreTarget > 0 ? explicitStoreTarget : Math.round(storeTotals[kpi].target * 100) / 100;
                     let cellText = '<span style="color: #cbd5e1;">-</span>';
 
                     if (target > 0) {
@@ -1819,6 +1821,92 @@
 
         if (closeTeamSummary) closeTeamSummary.addEventListener('click', () => teamSummaryModal.style.display = 'none');
         if (teamSummaryModal) teamSummaryModal.addEventListener('click', (e) => { if(e.target === teamSummaryModal) teamSummaryModal.style.display = 'none'; });
+
+        // --- STORE TARGETS LOGIC ---
+        const storeTargetsBtn = document.getElementById('storeTargetsBtn');
+        const storeTargetsModal = document.getElementById('storeTargetsModal');
+        const closeStoreTargets = document.getElementById('closeStoreTargets');
+        const saveStoreTargets = document.getElementById('saveStoreTargets');
+        const storeTargetsGrid = document.getElementById('storeTargetsGrid');
+        const storeTargetMonthName = document.getElementById('storeTargetMonthName');
+
+        function updateStoreDailyTargets() {
+            const currentYear = new Date().getFullYear();
+            const month = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10);
+            const daysInMonth = new Date(currentYear, month, 0).getDate();
+            
+            kpiList.forEach(kpi => {
+                const input = document.getElementById(`store-target-${kpi}`);
+                const dailyDisplay = document.getElementById(`store-daily-${kpi}`);
+                if (input && dailyDisplay) {
+                    const target = parseFloat(input.value) || 0;
+                    const daily = target > 0 ? (target / daysInMonth).toFixed(1) : 0;
+                    dailyDisplay.textContent = daily;
+                }
+            });
+        }
+
+        if (storeTargetsBtn) {
+            storeTargetsBtn.addEventListener('click', () => {
+                const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+                const monthIdx = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10) - 1;
+                if (storeTargetMonthName) storeTargetMonthName.textContent = monthNames[monthIdx];
+
+                const storeData = allAdvisorsData['store'] || {};
+                if (storeTargetsGrid) storeTargetsGrid.innerHTML = '';
+                
+                kpiList.forEach(kpi => {
+                    const savedTarget = storeData[`target_${kpi}`] !== undefined ? storeData[`target_${kpi}`] : '';
+                    
+                    const box = document.createElement('div');
+                    box.className = 'input-group';
+                    box.style.background = '#f8fafc';
+                    box.style.padding = '0.75rem';
+                    box.style.borderRadius = '8px';
+                    box.style.border = '1px solid #e2e8f0';
+                    box.style.marginBottom = '0';
+                    
+                    box.innerHTML = `
+                        <label style="margin-bottom: 0.25rem;">${kpi}</label>
+                        <input type="number" id="store-target-${kpi}" value="${savedTarget}" placeholder="Monthly Target" min="0" step="any" style="margin-bottom: 0.5rem; background: white;">
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                            <span>Daily Required:</span>
+                            <span id="store-daily-${kpi}" style="color: var(--primary-color);">0</span>
+                        </div>
+                    `;
+                    if (storeTargetsGrid) storeTargetsGrid.appendChild(box);
+                });
+                
+                kpiList.forEach(kpi => {
+                    const input = document.getElementById(`store-target-${kpi}`);
+                    if (input) input.addEventListener('input', updateStoreDailyTargets);
+                });
+                
+                updateStoreDailyTargets();
+                if (storeTargetsModal) storeTargetsModal.style.display = 'flex';
+            });
+        }
+
+        if (closeStoreTargets) closeStoreTargets.addEventListener('click', () => storeTargetsModal.style.display = 'none');
+        if (storeTargetsModal) storeTargetsModal.addEventListener('click', (e) => { if(e.target === storeTargetsModal) storeTargetsModal.style.display = 'none'; });
+
+        if (saveStoreTargets) {
+            saveStoreTargets.addEventListener('click', () => {
+                if (!allAdvisorsData['store']) allAdvisorsData['store'] = {};
+                
+                kpiList.forEach(kpi => {
+                    const input = document.getElementById(`store-target-${kpi}`);
+                    if (input) {
+                        allAdvisorsData['store'][`target_${kpi}`] = input.value;
+                    }
+                });
+                
+                allAdvisorsData['store'].lastSaved = new Date().toISOString();
+                
+                if (storeTargetsModal) storeTargetsModal.style.display = 'none';
+                saveToCloud();
+            });
+        }
         });
 
         // Register Service Worker for PWA support
