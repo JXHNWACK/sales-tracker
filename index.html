@@ -1457,24 +1457,43 @@
                     validStats.sort((a, b) => b.runRate - a.runRate);
                     const onTrack = validStats.filter(s => s.runRate >= 100);
                     const behind = validStats.filter(s => s.runRate < 100);
+                    
+                    const totalSoldRaw = validStats.reduce((sum, s) => sum + (isNaN(s.mtd) ? 0 : s.mtd), 0);
+                    const totalSold = Math.round(totalSoldRaw * 100) / 100;
+                    const avgRunRate = (validStats.reduce((sum, s) => sum + s.runRate, 0) / validStats.length).toFixed(1);
+                    const topPerformer = validStats[0];
+                    const lowestPerformer = validStats[validStats.length - 1];
 
+                    // Always visible summary
+                    insightsHtml += `<div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">`;
+                    insightsHtml += `<div>📈 <strong>Total Tracked:</strong> You've logged <strong>${totalSold}</strong> total units/points.</div>`;
+                    insightsHtml += `<div>🎯 <strong>Target Status:</strong> Hitting <strong>${onTrack.length}</strong> out of ${validStats.length} active KPIs.</div>`;
+                    insightsHtml += `</div>`;
+
+                    // Expandable Details Button
+                    insightsHtml += `<button onclick="const d = document.getElementById('insightsMore'); const i = this.querySelector('i'); const t = this.querySelector('span'); if(d.style.display==='none'){ d.style.display='flex'; i.className='ph ph-caret-up'; t.textContent='Show less details'; } else { d.style.display='none'; i.className='ph ph-caret-down'; t.textContent='Show more details'; }" style="background: var(--btn-bg); border: none; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--primary-color); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;"><i class="ph ph-caret-down"></i> <span>Show more details</span></button>`;
+
+                    // Hidden Details Section
+                    insightsHtml += `<div id="insightsMore" style="display: none; flex-direction: column; gap: 0.75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">`;
                     insightsHtml += `<ul style="padding-left: 1.2rem; margin-bottom: 0; display: flex; flex-direction: column; gap: 0.5rem;">`;
                     
                     if (onTrack.length > 0) {
                         const names = onTrack.map(s => `<strong>${s.name}</strong>`).join(', ');
-                        insightsHtml += `<li>🌟 <strong>On Track:</strong> You are hitting or exceeding targets for ${names}.</li>`;
+                        insightsHtml += `<li>🌟 <strong>On Track:</strong> Hitting or exceeding targets for ${names}.</li>`;
                     }
-                    
                     if (behind.length > 0) {
                         const focus = behind.sort((a, b) => b.shortfall - a.shortfall).slice(0, 3);
                         const focusNames = focus.map(s => `<strong>${s.name}</strong> (need ${s.reqPerShift}/shift)`).join(', ');
                         insightsHtml += `<li>🎯 <strong>Focus Areas:</strong> To catch up, prioritize ${focusNames}.</li>`;
                     }
-
-                    const totalSold = validStats.reduce((sum, s) => sum + (isNaN(s.mtd) ? 0 : s.mtd), 0);
-                    insightsHtml += `<li>📈 <strong>Total Tracked:</strong> You've logged <strong>${totalSold}</strong> total units/points across your targets!</li>`;
                     
-                    insightsHtml += `</ul>`;
+                    insightsHtml += `<li>🏆 <strong>Top Performer:</strong> ${topPerformer.name} (${topPerformer.runRate.toFixed(1)}% run rate).</li>`;
+                    if (behind.length > 0 && lowestPerformer.runRate < 100) {
+                        insightsHtml += `<li>⚠️ <strong>Biggest Opportunity:</strong> ${lowestPerformer.name} (falling behind at ${lowestPerformer.runRate.toFixed(1)}%).</li>`;
+                    }
+                    insightsHtml += `<li>📊 <strong>Average Run Rate:</strong> ${avgRunRate}% across all set targets.</li>`;
+                    
+                    insightsHtml += `</ul></div>`;
                 } else {
                     insightsHtml += `<p style="margin-bottom: 0; color: var(--text-muted);"><i class="ph ph-info"></i> Set some targets to see your performance insights!</p>`;
                 }
