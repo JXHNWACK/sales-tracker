@@ -381,6 +381,22 @@
         .btn-summary:hover { background-color: #e9d5ff; }
         .btn-summary:active { transform: scale(0.95); }
         
+        .btn-action {
+            background-color: #ffedd5;
+            color: #ea580c;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .btn-action:hover { background-color: #fed7aa; }
+        .btn-action:active { transform: scale(0.95); }
+        
         .progress-container {
             width: 100%;
             height: 6px;
@@ -513,6 +529,7 @@
             <button id="resetBtn" class="btn-reset"><i class="ph ph-arrow-counter-clockwise"></i> Reset Current Advisor</button>
             <button id="bulkEditBtn" class="btn-bulk" style="display: none;"><i class="ph ph-clipboard-text"></i> Bulk Edit MTD</button>
             <button id="teamSummaryBtn" class="btn-summary" style="display: none;"><i class="ph ph-camera"></i> Team Summary</button>
+            <button id="actionReportBtn" class="btn-action" style="display: none;"><i class="ph ph-warning-circle"></i> Action Report</button>
         </div>
         
         <div id="welcomeMessage" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
@@ -986,6 +1003,22 @@
         </div>
     </div>
 
+    <!-- Action Report Modal -->
+    <div id="actionReportModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);"><i class="ph ph-warning-circle" style="color: #ea580c;"></i> Action Report</h3>
+                <button id="closeActionReport" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <div id="actionReportContent" style="display: flex; flex-direction: column; gap: 1rem;">
+                <!-- Populated by JS -->
+            </div>
+            <div style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
+                <i class="ph-fill ph-camera" style="color: #3b82f6;"></i> Screenshot this to easily share updates on WhatsApp!
+            </div>
+        </div>
+    </div>
+
     <!-- Store Targets Modal -->
     <div id="storeTargetsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
         <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
@@ -1078,6 +1111,8 @@
                 if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
                 const summaryBtn = document.getElementById('teamSummaryBtn');
                 if (summaryBtn) summaryBtn.style.display = isManager ? 'inline-block' : 'none';
+                const actionBtn = document.getElementById('actionReportBtn');
+                if (actionBtn) actionBtn.style.display = isManager ? 'inline-block' : 'none';
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -1466,15 +1501,15 @@
 
                     // Always visible summary
                     insightsHtml += `<div style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">`;
-                    insightsHtml += `<div>📈 <strong>Total Tracked:</strong> You've logged <strong>${totalSold}</strong> total units/points.</div>`;
+                    insightsHtml += `<div>📈 <strong>Total Tracked:</strong> You've logged <strong>${totalSold}</strong> total points so far.</div>`;
                     insightsHtml += `<div>🎯 <strong>Target Status:</strong> Hitting <strong>${onTrack.length}</strong> out of ${validStats.length} active KPIs.</div>`;
                     insightsHtml += `</div>`;
 
                     // Expandable Details Button
-                    insightsHtml += `<button onclick="const d = document.getElementById('insightsMore'); const i = this.querySelector('i'); const t = this.querySelector('span'); if(d.style.display==='none'){ d.style.display='flex'; i.className='ph ph-caret-up'; t.textContent='Show less details'; } else { d.style.display='none'; i.className='ph ph-caret-down'; t.textContent='Show more details'; }" style="background: var(--btn-bg); border: none; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--primary-color); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;"><i class="ph ph-caret-down"></i> <span>Show more details</span></button>`;
+                    insightsHtml += `<button onclick="const d = document.getElementById('insightsMore'); const i = this.querySelector('i'); const t = this.querySelector('span'); if(d.style.maxHeight==='0px'){ d.style.maxHeight='500px'; d.style.opacity='1'; d.style.marginTop='1rem'; d.style.paddingTop='1rem'; d.style.borderTop='1px dashed var(--border-color)'; i.className='ph ph-caret-up'; t.textContent='Show less details'; } else { d.style.maxHeight='0px'; d.style.opacity='0'; d.style.marginTop='0'; d.style.paddingTop='0'; d.style.borderTop='none'; i.className='ph ph-caret-down'; t.textContent='Show more details'; }" style="background: var(--btn-bg); border: none; border-radius: 6px; padding: 0.5rem 1rem; font-size: 0.85rem; font-weight: 600; color: var(--primary-color); cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: background 0.2s;"><i class="ph ph-caret-down"></i> <span>Show more details</span></button>`;
 
                     // Hidden Details Section
-                    insightsHtml += `<div id="insightsMore" style="display: none; flex-direction: column; gap: 0.75rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">`;
+                    insightsHtml += `<div id="insightsMore" style="max-height: 0px; opacity: 0; overflow: hidden; transition: all 0.3s ease; display: flex; flex-direction: column; gap: 0.75rem; margin-top: 0; padding-top: 0; border-top: none;">`;
                     insightsHtml += `<ul style="padding-left: 1.2rem; margin-bottom: 0; display: flex; flex-direction: column; gap: 0.5rem;">`;
                     
                     if (onTrack.length > 0) {
@@ -2017,6 +2052,97 @@
 
         if (closeTeamSummary) closeTeamSummary.addEventListener('click', () => teamSummaryModal.style.display = 'none');
         if (teamSummaryModal) teamSummaryModal.addEventListener('click', (e) => { if(e.target === teamSummaryModal) teamSummaryModal.style.display = 'none'; });
+
+        // --- ACTION REPORT LOGIC ---
+        const actionReportBtn = document.getElementById('actionReportBtn');
+        const actionReportModal = document.getElementById('actionReportModal');
+        const closeActionReport = document.getElementById('closeActionReport');
+        const actionReportContent = document.getElementById('actionReportContent');
+
+        if (actionReportBtn) {
+            actionReportBtn.addEventListener('click', () => {
+                actionReportContent.innerHTML = '';
+                const currentYear = new Date().getFullYear();
+                const month = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10);
+                const daysInMonth = new Date(currentYear, month, 0).getDate();
+                const todayDate = new Date();
+                todayDate.setHours(0,0,0,0);
+
+                let reportHtml = '';
+
+                baseAdvisorsList.forEach(adv => {
+                    const advData = allAdvisorsData[adv.key];
+                    if (!advData) return;
+
+                    const scheduledDays = (advData.schedules && advData.schedules[month.toString()]) ? advData.schedules[month.toString()] : [];
+                    
+                    let passed = 0;
+                    let remaining = 0;
+                    scheduledDays.forEach(day => {
+                        const dayDate = new Date(currentYear, month - 1, day);
+                        dayDate.setHours(0,0,0,0);
+                        if (dayDate < todayDate) passed++;
+                        else remaining++;
+                    });
+
+                    // Only include advisors who have worked so far
+                    if (passed === 0) return;
+
+                    let behindKpis = [];
+                    let zeroKpis = [];
+
+                    kpiList.forEach(kpi => {
+                        const target = parseFloat(advData[`target_${kpi}`]) || 0;
+                        const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
+
+                        if (target > 0) {
+                            if (mtd === 0) {
+                                zeroKpis.push(kpi);
+                            } else {
+                                const projectedTotal = (mtd / passed) * daysInMonth;
+                                const runRate = (projectedTotal / target) * 100;
+                                if (runRate < 100) {
+                                    let shortfall = target - mtd;
+                                    let perShift = remaining > 0 ? Math.ceil(shortfall / remaining) : 0;
+                                    behindKpis.push({ name: kpi, rr: runRate.toFixed(0), need: perShift });
+                                }
+                            }
+                        }
+                    });
+
+                    if (behindKpis.length > 0 || zeroKpis.length > 0) {
+                        reportHtml += `<div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">`;
+                        reportHtml += `<h4 style="margin: 0 0 0.5rem 0; color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">👤 ${adv.name} <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(${passed} shifts done, ${remaining} left)</span></h4>`;
+                        
+                        if (zeroKpis.length > 0) {
+                            reportHtml += `<div style="font-size: 0.85rem; margin-bottom: 0.5rem;">🚨 <strong>Not Sold Yet:</strong> <span style="color: #ef4444; font-weight: 600;">${zeroKpis.join(', ')}</span></div>`;
+                        }
+                        
+                        if (behindKpis.length > 0) {
+                            reportHtml += `<div style="font-size: 0.85rem;">⚠️ <strong>Behind On:</strong></div>`;
+                            reportHtml += `<ul style="margin: 0.25rem 0 0 0; padding-left: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">`;
+                            behindKpis.forEach(bk => {
+                                let catchUpText = remaining > 0 ? `need ${bk.need}/shift to catch up` : `0 shifts left to catch up`;
+                                reportHtml += `<li><strong>${bk.name}</strong> (${bk.rr}% run rate) — ${catchUpText}</li>`;
+                            });
+                            reportHtml += `</ul>`;
+                        }
+                        
+                        reportHtml += `</div>`;
+                    }
+                });
+
+                if (reportHtml === '') {
+                    reportHtml = `<div style="text-align: center; padding: 2rem; color: #10b981; font-weight: 600;"><i class="ph-fill ph-check-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>Everyone is on track!</div>`;
+                }
+
+                actionReportContent.innerHTML = reportHtml;
+                actionReportModal.style.display = 'flex';
+            });
+        }
+
+        if (closeActionReport) closeActionReport.addEventListener('click', () => actionReportModal.style.display = 'none');
+        if (actionReportModal) actionReportModal.addEventListener('click', (e) => { if(e.target === actionReportModal) actionReportModal.style.display = 'none'; });
 
         // --- STORE TARGETS LOGIC ---
         const storeTargetsBtn = document.getElementById('storeTargetsBtn');
