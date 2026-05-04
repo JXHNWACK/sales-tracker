@@ -397,6 +397,22 @@
         .btn-action:hover { background-color: #fed7aa; }
         .btn-action:active { transform: scale(0.95); }
         
+        .btn-deals {
+            background-color: #fce7f3;
+            color: #db2777;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .btn-deals:hover { background-color: #fbcfe8; }
+        .btn-deals:active { transform: scale(0.95); }
+        
         .progress-container {
             width: 100%;
             height: 6px;
@@ -530,6 +546,7 @@
             <button id="bulkEditBtn" class="btn-bulk" style="display: none;"><i class="ph ph-clipboard-text"></i> Bulk Edit MTD</button>
             <button id="teamSummaryBtn" class="btn-summary" style="display: none;"><i class="ph ph-camera"></i> Team Summary</button>
             <button id="actionReportBtn" class="btn-action" style="display: none;"><i class="ph ph-warning-circle"></i> Action Report</button>
+            <button id="storeDealsBtn" class="btn-deals" style="display: none;"><i class="ph ph-tag"></i> Top Deals</button>
         </div>
         
         <div id="welcomeMessage" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
@@ -1038,6 +1055,37 @@
         </div>
     </div>
 
+    <!-- Store Deals Modal -->
+    <div id="storeDealsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 500px; width: 95%; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main);"><i class="ph ph-tag" style="color: #db2777;"></i> Three.co.uk - Top Deals</h3>
+                <button id="closeStoreDeals" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            
+            <div style="background: var(--input-bg); padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 1rem;">
+                <div id="dealsDisplayView">
+                    <h4 style="margin-top: 0; margin-bottom: 0.5rem; color: var(--text-main);">Current Store Focus Deals:</h4>
+                    <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-muted); line-height: 1.6;" id="dealsList">
+                        <!-- Populated by JS -->
+                    </ul>
+                </div>
+                
+                <div id="dealsEditView" style="display: none; flex-direction: column; gap: 0.5rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border-color);">
+                    <h4 style="margin-top: 0; margin-bottom: 0.25rem; color: var(--text-main);">Update Deals (Manager):</h4>
+                    <input type="text" id="deal1Input" placeholder="Deal 1 (e.g. iPhone 15 100GB - £30/m)">
+                    <input type="text" id="deal2Input" placeholder="Deal 2 (e.g. Unlimited SIM - £12/m)">
+                    <input type="text" id="deal3Input" placeholder="Deal 3 (e.g. 5G Broadband - 3 Months Free)">
+                    <button id="saveDealsBtn" style="margin-top: 0.5rem; background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0.5rem; font-weight: bold; cursor: pointer; transition: background-color 0.2s;"><i class="ph ph-floppy-disk"></i> Save Focus Deals</button>
+                </div>
+            </div>
+            
+            <a href="https://www.three.co.uk/store/customised-deals" target="_blank" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; width: 100%; background: #000; color: #fff; text-decoration: none; padding: 0.75rem; border-radius: 6px; font-weight: bold; text-align: center; transition: opacity 0.2s;">
+                Open Three.co.uk Live Deals <i class="ph ph-arrow-square-out"></i>
+            </a>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const advisorSelect = document.getElementById('advisorSelect');
@@ -1113,6 +1161,8 @@
                 if (summaryBtn) summaryBtn.style.display = isManager ? 'inline-block' : 'none';
                 const actionBtn = document.getElementById('actionReportBtn');
                 if (actionBtn) actionBtn.style.display = isManager ? 'inline-block' : 'none';
+                const dealsBtn = document.getElementById('storeDealsBtn');
+                if (dealsBtn) dealsBtn.style.display = isDefault ? 'none' : 'inline-block'; // Visible to both once an advisor is picked
 
                 const saveBtn = document.getElementById('saveBtn');
                 saveBtn.disabled = isDefault;
@@ -2227,6 +2277,56 @@
                 
                 if (storeTargetsModal) storeTargetsModal.style.display = 'none';
                 saveToCloud();
+            });
+        }
+
+        // --- STORE DEALS LOGIC ---
+        const storeDealsBtn = document.getElementById('storeDealsBtn');
+        const storeDealsModal = document.getElementById('storeDealsModal');
+        const closeStoreDeals = document.getElementById('closeStoreDeals');
+        const dealsEditView = document.getElementById('dealsEditView');
+        const dealsList = document.getElementById('dealsList');
+        const saveDealsBtn = document.getElementById('saveDealsBtn');
+
+        if (storeDealsBtn) {
+            storeDealsBtn.addEventListener('click', () => {
+                const isManager = document.getElementById('roleSelect').value === 'manager';
+                const storeData = allAdvisorsData['store'] || {};
+                
+                dealsList.innerHTML = `
+                    <li><strong>1.</strong> ${storeData.deal1 || "No focus deal set yet."}</li>
+                    <li><strong>2.</strong> ${storeData.deal2 || "No focus deal set yet."}</li>
+                    <li><strong>3.</strong> ${storeData.deal3 || "No focus deal set yet."}</li>
+                `;
+
+                if (isManager) {
+                    document.getElementById('deal1Input').value = storeData.deal1 || '';
+                    document.getElementById('deal2Input').value = storeData.deal2 || '';
+                    document.getElementById('deal3Input').value = storeData.deal3 || '';
+                    dealsEditView.style.display = 'flex';
+                } else {
+                    dealsEditView.style.display = 'none';
+                }
+
+                storeDealsModal.style.display = 'flex';
+            });
+        }
+
+        if (closeStoreDeals) closeStoreDeals.addEventListener('click', () => storeDealsModal.style.display = 'none');
+        if (storeDealsModal) storeDealsModal.addEventListener('click', (e) => { if(e.target === storeDealsModal) storeDealsModal.style.display = 'none'; });
+
+        if (saveDealsBtn) {
+            saveDealsBtn.addEventListener('click', () => {
+                if (!allAdvisorsData['store']) allAdvisorsData['store'] = {};
+                
+                allAdvisorsData['store'].deal1 = document.getElementById('deal1Input').value.trim();
+                allAdvisorsData['store'].deal2 = document.getElementById('deal2Input').value.trim();
+                allAdvisorsData['store'].deal3 = document.getElementById('deal3Input').value.trim();
+                allAdvisorsData['store'].lastSaved = new Date().toISOString();
+                
+                saveToCloud();
+                storeDealsModal.style.display = 'none';
+                showToast("Store Focus Deals updated!", "success");
             });
         }
         });
