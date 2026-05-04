@@ -849,6 +849,13 @@
             </div>
         </div>
 
+        <div class="summary-section" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+            <h3 style="margin-top: 0; margin-bottom: 1rem; color: var(--text-main);"><i class="ph ph-sparkle" style="color: #f59e0b;"></i> Performance Insights</h3>
+            <div id="advisorSummaryContent" style="background: var(--box-bg); border: 1px solid var(--card-border); padding: 1.25rem; border-radius: 12px; font-size: 0.95rem; line-height: 1.6; color: var(--text-muted); box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.02);">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
         <div class="leaderboard-section" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="margin: 0; color: var(--text-main);"><i class="ph ph-trophy" style="color: var(--primary-color);"></i> Team Leaderboard (Run Rate %)</h3>
@@ -1332,6 +1339,8 @@
                     lastSaved: allAdvisorsData[currentAdvisor] ? allAdvisorsData[currentAdvisor].lastSaved : undefined // Preserve existing lastSaved or set to undefined
                 };
 
+                const stats = [];
+
                 kpiTargets.forEach(targetInput => {
                     const kpiName = targetInput.getAttribute('data-kpi');
                     const mtdInput = document.querySelector(`.kpi-mtd[data-kpi="${kpiName}"]`);
@@ -1385,10 +1394,12 @@
                     let newRrBg = 'transparent';
 
                     let isCurrentlyOnTrack = false;
+                    let currentRunRateVal = 0;
 
                     if (!isNaN(mtd) && passed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
                         const projectedTotal = (mtd / passed) * daysInMonth;
                         const runRatePercent = (projectedTotal / target) * 100;
+                        currentRunRateVal = runRatePercent;
                         newRrText = runRatePercent.toFixed(2) + '%';
                         
                         if (runRatePercent < 100) {
@@ -1429,7 +1440,49 @@
                         // Add a glow effect if they are over 100%
                         progDisplay.style.boxShadow = isOverAchieving ? '0 0 10px 2px rgba(234, 179, 8, 0.6)' : 'none';
                     }
+
+                    stats.push({
+                        name: kpiName,
+                        mtd: mtd,
+                        target: target,
+                        runRate: currentRunRateVal,
+                        shortfall: remainingToHit,
+                        reqPerShift: remaining > 0 ? Math.ceil(remainingToHit / remaining) : 0
+                    });
                 });
+
+                let insightsHtml = `<p style="margin-top: 0; margin-bottom: 0.75rem;"><strong>Shift Summary:</strong> You have completed <span style="color: var(--primary-color); font-weight: bold;">${passed}</span> out of ${passed + remaining} scheduled shifts.</p>`;
+                const validStats = stats.filter(s => !isNaN(s.target) && s.target > 0);
+                if (validStats.length > 0) {
+                    validStats.sort((a, b) => b.runRate - a.runRate);
+                    const onTrack = validStats.filter(s => s.runRate >= 100);
+                    const behind = validStats.filter(s => s.runRate < 100);
+
+                    insightsHtml += `<ul style="padding-left: 1.2rem; margin-bottom: 0; display: flex; flex-direction: column; gap: 0.5rem;">`;
+                    
+                    if (onTrack.length > 0) {
+                        const names = onTrack.map(s => `<strong>${s.name}</strong>`).join(', ');
+                        insightsHtml += `<li>🌟 <strong>On Track:</strong> You are hitting or exceeding targets for ${names}.</li>`;
+                    }
+                    
+                    if (behind.length > 0) {
+                        const focus = behind.sort((a, b) => b.shortfall - a.shortfall).slice(0, 3);
+                        const focusNames = focus.map(s => `<strong>${s.name}</strong> (need ${s.reqPerShift}/shift)`).join(', ');
+                        insightsHtml += `<li>🎯 <strong>Focus Areas:</strong> To catch up, prioritize ${focusNames}.</li>`;
+                    }
+
+                    const totalSold = validStats.reduce((sum, s) => sum + (isNaN(s.mtd) ? 0 : s.mtd), 0);
+                    insightsHtml += `<li>📈 <strong>Total Tracked:</strong> You've logged <strong>${totalSold}</strong> total units/points across your targets!</li>`;
+                    
+                    insightsHtml += `</ul>`;
+                } else {
+                    insightsHtml += `<p style="margin-bottom: 0; color: var(--text-muted);"><i class="ph ph-info"></i> Set some targets to see your performance insights!</p>`;
+                }
+
+                const summaryContent = document.getElementById('advisorSummaryContent');
+                if (summaryContent) {
+                    summaryContent.innerHTML = insightsHtml;
+                }
 
                 if (currentAdvisor !== 'default') {
                     // Update the global data object with this advisor's new numbers
