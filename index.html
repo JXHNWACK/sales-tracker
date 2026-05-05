@@ -365,6 +365,22 @@
             transform: scale(0.95);
         }
         
+        .btn-target {
+            background-color: #dcfce7;
+            color: #059669;
+            border: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-top: 0.75rem;
+            margin-left: 0.5rem;
+        }
+        .btn-target:hover { background-color: #bbf7d0; }
+        .btn-target:active { transform: scale(0.95); }
+        
         .btn-summary {
             background-color: #f3e8ff;
             color: #7e22ce;
@@ -516,10 +532,8 @@
             <h2>KPI Target Calculator</h2>
             
             <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.4rem; flex-wrap: nowrap;">
-                <select id="roleSelect" style="width: auto; height: 28px; padding: 0.15rem 0.5rem; border-radius: 999px; border-color: var(--primary-color); font-weight: bold; color: white; background-color: var(--primary-color); cursor: pointer; font-size: 0.75rem; text-align: center; outline: none;">
-                    <option value="advisor">👤 Advisor</option>
-                    <option value="manager">👑 Manager</option>
-                </select>
+                <button id="roleAdvisorBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--primary-color); color: white; border: 1px solid var(--primary-color);">👤 Advisor</button>
+                <button id="roleManagerBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--box-bg); color: var(--text-muted); border: 1px solid var(--border-color);">👑 Manager</button>
                 <button id="darkModeBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; border: 1px solid var(--border-color); font-weight: bold; color: var(--text-muted); background-color: var(--box-bg); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;"><i class="ph ph-moon"></i> Dark Mode</button>
                 <button id="openCustomizeBtn" style="display: none; width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; border: 1px solid var(--border-color); font-weight: bold; color: var(--text-muted); background-color: var(--box-bg); cursor: pointer; font-size: 0.75rem; align-items: center; gap: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;"><i class="ph ph-palette"></i> Customize</button>
             </div>
@@ -544,6 +558,7 @@
             </div>
             <button id="resetBtn" class="btn-reset"><i class="ph ph-arrow-counter-clockwise"></i> Reset Current Advisor</button>
             <button id="bulkEditBtn" class="btn-bulk" style="display: none;"><i class="ph ph-clipboard-text"></i> Bulk Edit MTD</button>
+            <button id="storeTargetsBtn" class="btn-target" style="display: none;"><i class="ph ph-target"></i> Store Targets</button>
             <button id="teamSummaryBtn" class="btn-summary" style="display: none;"><i class="ph ph-camera"></i> Team Summary</button>
             <button id="actionReportBtn" class="btn-action" style="display: none;"><i class="ph ph-warning-circle"></i> Action Report</button>
             <button id="storeDealsBtn" class="btn-deals" style="display: none;"><i class="ph ph-tag"></i> Top Deals</button>
@@ -1138,11 +1153,31 @@
                 }, 3000);
             }
 
-            const roleSelect = document.getElementById('roleSelect');
+            let currentRole = 'advisor';
+            const roleAdvisorBtn = document.getElementById('roleAdvisorBtn');
+            const roleManagerBtn = document.getElementById('roleManagerBtn');
             const MANAGER_PIN = "1203"; // You can change this PIN to whatever you want!
 
+            function updateRoleButtons() {
+                if (currentRole === 'advisor') {
+                    roleAdvisorBtn.style.backgroundColor = 'var(--primary-color)';
+                    roleAdvisorBtn.style.color = 'white';
+                    roleAdvisorBtn.style.borderColor = 'var(--primary-color)';
+                    roleManagerBtn.style.backgroundColor = 'var(--box-bg)';
+                    roleManagerBtn.style.color = 'var(--text-muted)';
+                    roleManagerBtn.style.borderColor = 'var(--border-color)';
+                } else {
+                    roleManagerBtn.style.backgroundColor = 'var(--primary-color)';
+                    roleManagerBtn.style.color = 'white';
+                    roleManagerBtn.style.borderColor = 'var(--primary-color)';
+                    roleAdvisorBtn.style.backgroundColor = 'var(--box-bg)';
+                    roleAdvisorBtn.style.color = 'var(--text-muted)';
+                    roleAdvisorBtn.style.borderColor = 'var(--border-color)';
+                }
+            }
+
             function applyRolePermissions() {
-                const isManager = roleSelect.value === 'manager';
+                const isManager = currentRole === 'manager';
                 const isDefault = advisorSelect.value === 'default';
                 
                 document.getElementById('openCustomizeBtn').style.display = isDefault ? 'none' : 'flex';
@@ -1160,10 +1195,12 @@
                 document.getElementById('resetBtn').style.display = (isManager && !isDefault) ? 'inline-block' : 'none';
                 const bulkBtn = document.getElementById('bulkEditBtn');
                 if (bulkBtn) bulkBtn.style.display = isManager ? 'inline-block' : 'none';
+                const storeTargetsBtn = document.getElementById('storeTargetsBtn');
+                if (storeTargetsBtn) storeTargetsBtn.style.display = isManager ? 'inline-block' : 'none';
                 const summaryBtn = document.getElementById('teamSummaryBtn');
                 if (summaryBtn) summaryBtn.style.display = isManager ? 'inline-block' : 'none';
                 const actionBtn = document.getElementById('actionReportBtn');
-                if (actionBtn) actionBtn.style.display = isManager ? 'inline-block' : 'none';
+                if (actionBtn) actionBtn.style.display = isDefault ? 'none' : 'inline-block';
                 const dealsBtn = document.getElementById('storeDealsBtn');
                 if (dealsBtn) dealsBtn.style.display = isDefault ? 'none' : 'inline-block'; // Visible to both once an advisor is picked
 
@@ -1177,18 +1214,29 @@
                 document.getElementById('welcomeMessage').style.display = isDefault ? 'block' : 'none';
             }
 
-            roleSelect.addEventListener('change', () => {
-                if (roleSelect.value === 'manager') {
+            roleAdvisorBtn.addEventListener('click', () => {
+                if (currentRole !== 'advisor') {
+                    currentRole = 'advisor';
+                    updateRoleButtons();
+                    applyRolePermissions();
+                    renderCalendar();
+                }
+            });
+
+            roleManagerBtn.addEventListener('click', () => {
+                if (currentRole !== 'manager') {
                     const pin = prompt("Enter Manager PIN to unlock Target settings:");
                     if (pin !== MANAGER_PIN) {
                         showToast("Incorrect PIN.", "error");
-                        roleSelect.value = 'advisor';
+                        return;
                     } else {
                         showToast("Manager Mode Unlocked", "success");
+                        currentRole = 'manager';
+                        updateRoleButtons();
+                        applyRolePermissions();
+                        renderCalendar(); // Refresh calendar to lock/unlock clickable days
                     }
                 }
-                applyRolePermissions();
-                renderCalendar(); // Refresh calendar to lock/unlock clickable days
             });
 
             // Check if user is on GitHub Pages or a local file instead of Railway
@@ -1370,7 +1418,7 @@
                         dayDiv.classList.add('selected');
                     }
                     
-                    if (document.getElementById('roleSelect').value === 'manager') {
+                    if (currentRole === 'manager') {
                         dayDiv.addEventListener('click', () => {
                             const idx = scheduledDays.indexOf(i);
                             if (idx > -1) {
@@ -1788,7 +1836,7 @@
             // Listener for the custom MTD stepper buttons
             document.querySelectorAll('.mtd-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
-                    if (roleSelect.value === 'manager') return; // Disabled in manager mode
+                    if (currentRole === 'manager') return; // Disabled in manager mode
                     
                     const kpi = e.target.getAttribute('data-kpi');
                     const input = document.querySelector(`.kpi-mtd[data-kpi="${kpi}"]`);
@@ -2154,7 +2202,15 @@
 
                 let reportHtml = '';
 
-                baseAdvisorsList.forEach(adv => {
+                let advisorsToShow = baseAdvisorsList;
+                if (currentRole === 'advisor') {
+                    advisorsToShow = baseAdvisorsList.filter(adv => adv.key === advisorSelect.value);
+                    if (toggleActionFilter) toggleActionFilter.style.display = 'none';
+                } else {
+                    if (toggleActionFilter) toggleActionFilter.style.display = '';
+                }
+
+                advisorsToShow.forEach(adv => {
                     const advData = allAdvisorsData[adv.key];
                     if (!advData) return;
 
@@ -2242,7 +2298,8 @@
                 });
 
                 if (reportHtml === '') {
-                    reportHtml = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #10b981; font-weight: 600;"><i class="ph-fill ph-check-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>Everyone is on track!</div>`;
+                    let successText = currentRole === 'advisor' ? 'You are on track!' : 'Everyone is on track!';
+                    reportHtml = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #10b981; font-weight: 600;"><i class="ph-fill ph-check-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>${successText}</div>`;
                 }
 
                 actionReportContent.innerHTML = reportHtml;
@@ -2266,13 +2323,39 @@
             const month = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10);
             const daysInMonth = new Date(currentYear, month, 0).getDate();
             
+            const todayDate = new Date();
+            todayDate.setHours(0,0,0,0);
+            let daysLeft = 0;
+            for (let i = 1; i <= daysInMonth; i++) {
+                const d = new Date(currentYear, month - 1, i);
+                d.setHours(0,0,0,0);
+                if (d >= todayDate) daysLeft++;
+            }
+
+            const storeTotals = {};
+            kpiList.forEach(kpi => storeTotals[kpi] = 0);
+            baseAdvisorsList.forEach(adv => {
+                const data = allAdvisorsData[adv.key] || {};
+                kpiList.forEach(kpi => {
+                    storeTotals[kpi] += parseFloat(data[`mtd_${kpi}`]) || 0;
+                });
+            });
+
             kpiList.forEach(kpi => {
                 const input = document.getElementById(`store-target-${kpi}`);
                 const dailyDisplay = document.getElementById(`store-daily-${kpi}`);
+                const needNowDisplay = document.getElementById(`store-neednow-${kpi}`);
                 if (input && dailyDisplay) {
                     const target = parseFloat(input.value) || 0;
                     const daily = target > 0 ? (target / daysInMonth).toFixed(1) : 0;
                     dailyDisplay.textContent = daily;
+                    
+                    if (needNowDisplay) {
+                        const mtd = storeTotals[kpi];
+                        let remaining = Math.max(0, target - mtd);
+                        let needPerDay = daysLeft > 0 ? Math.ceil(remaining / daysLeft) : 0;
+                        needNowDisplay.textContent = target > 0 ? needPerDay : 0;
+                    }
                 }
             });
         }
@@ -2300,9 +2383,13 @@
                     box.innerHTML = `
                         <label style="margin-bottom: 0.25rem;">${kpi}</label>
                         <input type="number" id="store-target-${kpi}" value="${savedTarget}" placeholder="Monthly Target" min="0" step="any" style="margin-bottom: 0.5rem;">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
-                            <span>Daily Required:</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.25rem;">
+                            <span>Base Daily:</span>
                             <span id="store-daily-${kpi}" style="color: var(--primary-color);">0</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); font-weight: 600;">
+                            <span>Need Now:</span>
+                            <span id="store-neednow-${kpi}" style="color: #ea580c;">0</span>
                         </div>
                     `;
                     if (storeTargetsGrid) storeTargetsGrid.appendChild(box);
@@ -2349,7 +2436,7 @@
 
         if (storeDealsBtn) {
             storeDealsBtn.addEventListener('click', () => {
-                const isManager = document.getElementById('roleSelect').value === 'manager';
+                const isManager = currentRole === 'manager';
                 const storeData = allAdvisorsData['store'] || {};
                 
                 dealsList.innerHTML = `
