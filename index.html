@@ -1022,12 +1022,15 @@
 
     <!-- Action Report Modal -->
     <div id="actionReportModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
-        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 600px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 800px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <h3 style="margin: 0; color: var(--text-main);"><i class="ph ph-warning-circle" style="color: #ea580c;"></i> Action Report</h3>
-                <button id="closeActionReport" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                <div style="display: flex; gap: 0.75rem; align-items: center;">
+                    <button id="toggleActionFilter" style="background-color: var(--input-bg); border: 1px solid var(--border-color); color: var(--text-muted); padding: 0.4rem 0.75rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.2s;"><i class="ph ph-users"></i> All Advisors</button>
+                    <button id="closeActionReport" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+                </div>
             </div>
-            <div id="actionReportContent" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div id="actionReportContent" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.75rem;">
                 <!-- Populated by JS -->
             </div>
             <div style="margin-top: 1.5rem; text-align: center; font-size: 0.85rem; color: var(--text-muted);">
@@ -2108,6 +2111,34 @@
         const actionReportModal = document.getElementById('actionReportModal');
         const closeActionReport = document.getElementById('closeActionReport');
         const actionReportContent = document.getElementById('actionReportContent');
+        const toggleActionFilter = document.getElementById('toggleActionFilter');
+        let actionFilterWorkingOnly = false;
+
+        if (toggleActionFilter) {
+            toggleActionFilter.addEventListener('click', () => {
+                actionFilterWorkingOnly = !actionFilterWorkingOnly;
+                if (actionFilterWorkingOnly) {
+                    toggleActionFilter.innerHTML = '<i class="ph ph-calendar-check"></i> In Today';
+                    toggleActionFilter.style.color = 'var(--primary-color)';
+                    toggleActionFilter.style.borderColor = 'var(--primary-color)';
+                    toggleActionFilter.style.backgroundColor = '#e0e7ff';
+                } else {
+                    toggleActionFilter.innerHTML = '<i class="ph ph-users"></i> All Advisors';
+                    toggleActionFilter.style.color = 'var(--text-muted)';
+                    toggleActionFilter.style.borderColor = 'var(--border-color)';
+                    toggleActionFilter.style.backgroundColor = 'var(--input-bg)';
+                }
+                
+                const cards = document.querySelectorAll('.action-advisor-card');
+                cards.forEach(card => {
+                    if (actionFilterWorkingOnly && card.getAttribute('data-working-today') !== 'true') {
+                        card.style.display = 'none';
+                    } else {
+                        card.style.display = 'flex';
+                    }
+                });
+            });
+        }
 
         if (actionReportBtn) {
             actionReportBtn.addEventListener('click', () => {
@@ -2116,6 +2147,7 @@
                 const month = parseInt(document.getElementById('monthSelect').value || (new Date().getMonth() + 1), 10);
                 const daysInMonth = new Date(currentYear, month, 0).getDate();
                 const todayDate = new Date();
+                const todayDay = todayDate.getDate();
                 todayDate.setHours(0,0,0,0);
 
                 let reportHtml = '';
@@ -2135,8 +2167,10 @@
                         else remaining++;
                     });
 
-                    // Only include advisors who have worked so far
-                    if (passed === 0) return;
+                    const isWorkingToday = scheduledDays.includes(todayDay);
+
+                    // Only include advisors who have worked so far OR are scheduled to work today
+                    if (passed === 0 && !isWorkingToday) return;
 
                     let behindKpis = [];
                     let zeroKpis = [];
@@ -2146,36 +2180,56 @@
                         const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
 
                         if (target > 0) {
+                            // Calculate exactly how many they need by the end of their current shift to be 100% on track
+                            let needToday = Math.ceil((target * (passed + 1) / daysInMonth) - mtd);
+                            needToday = Math.max(0, needToday);
+
                             if (mtd === 0) {
-                                zeroKpis.push(kpi);
+                                zeroKpis.push({ name: kpi, needToday: needToday });
                             } else {
-                                const projectedTotal = (mtd / passed) * daysInMonth;
-                                const runRate = (projectedTotal / target) * 100;
-                                if (runRate < 100) {
-                                    let shortfall = target - mtd;
-                                    let perShift = remaining > 0 ? Math.ceil(shortfall / remaining) : 0;
-                                    behindKpis.push({ name: kpi, rr: runRate.toFixed(0), need: perShift });
+                                const projectedTotal = passed > 0 ? (mtd / passed) * daysInMonth : 0;
+                                const runRate = passed > 0 ? (projectedTotal / target) * 100 : 0;
+                                
+                                if (runRate < 100 || passed === 0) {
+                                    behindKpis.push({ name: kpi, rr: passed > 0 ? runRate.toFixed(0) : '0', needToday: needToday });
                                 }
                             }
                         }
                     });
 
                     if (behindKpis.length > 0 || zeroKpis.length > 0) {
-                        reportHtml += `<div style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">`;
-                        reportHtml += `<h4 style="margin: 0 0 0.5rem 0; color: var(--text-main); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;">👤 ${adv.name} <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: normal;">(${passed} shifts done, ${remaining} left)</span></h4>`;
+                        reportHtml += `<div class="action-advisor-card" data-working-today="${isWorkingToday}" style="background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 8px; padding: 0.75rem; flex-direction: column; gap: 0.4rem; ${actionFilterWorkingOnly && !isWorkingToday ? 'display: none;' : 'display: flex;'}">`;
+                        
+                        let statusBadge = isWorkingToday 
+                            ? `<span style="background: #10b981; color: white; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold; box-shadow: 0 1px 2px rgba(16,185,129,0.3);">IN TODAY</span>` 
+                            : `<span style="background: var(--border-color); color: var(--text-muted); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold;">OFF</span>`;
+
+                        reportHtml += `<h4 style="margin: 0; color: var(--text-main); border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem;"><span>👤 ${adv.name}</span> ${statusBadge}</h4>`;
                         
                         if (zeroKpis.length > 0) {
-                            reportHtml += `<div style="font-size: 0.85rem; margin-bottom: 0.5rem;">🚨 <strong>Not Sold Yet:</strong> <span style="color: #ef4444; font-weight: 600;">${zeroKpis.join(', ')}</span></div>`;
+                            reportHtml += `<div style="font-size: 0.75rem;">`;
+                            reportHtml += `<span style="font-weight: bold; color: #ef4444; display: block; margin-bottom: 0.3rem;">🚨 Zero Sold:</span>`;
+                            reportHtml += `<div style="display: flex; flex-direction: column; gap: 0.25rem;">`;
+                            zeroKpis.forEach(zk => {
+                                reportHtml += `<div style="display: flex; justify-content: space-between; background: #fef2f2; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #fecaca;">
+                                    <strong style="color: #dc2626;">${zk.name}</strong>
+                                    <span style="color: #dc2626; font-weight: bold;">Need ${zk.needToday} today</span>
+                                </div>`;
+                            });
+                            reportHtml += `</div></div>`;
                         }
                         
                         if (behindKpis.length > 0) {
-                            reportHtml += `<div style="font-size: 0.85rem;">⚠️ <strong>Behind On:</strong></div>`;
-                            reportHtml += `<ul style="margin: 0.25rem 0 0 0; padding-left: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">`;
+                            reportHtml += `<div style="font-size: 0.75rem; margin-top: 0.25rem;">`;
+                            reportHtml += `<span style="font-weight: bold; color: #ea580c; display: block; margin-bottom: 0.3rem;">⚠️ Behind On:</span>`;
+                            reportHtml += `<div style="display: flex; flex-direction: column; gap: 0.25rem;">`;
                             behindKpis.forEach(bk => {
-                                let catchUpText = remaining > 0 ? `need ${bk.need}/shift to catch up` : `0 shifts left to catch up`;
-                                reportHtml += `<li><strong>${bk.name}</strong> (${bk.rr}% run rate) — ${catchUpText}</li>`;
+                                reportHtml += `<div style="display: flex; justify-content: space-between; background: var(--box-bg); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--card-border); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                                    <strong style="color: var(--text-main);">${bk.name} <span style="color: var(--text-muted); font-weight: normal;">(${bk.rr}%)</span></strong>
+                                    <span style="color: var(--primary-color); font-weight: bold;">Need ${bk.needToday} today</span>
+                                </div>`;
                             });
-                            reportHtml += `</ul>`;
+                            reportHtml += `</div></div>`;
                         }
                         
                         reportHtml += `</div>`;
@@ -2183,7 +2237,7 @@
                 });
 
                 if (reportHtml === '') {
-                    reportHtml = `<div style="text-align: center; padding: 2rem; color: #10b981; font-weight: 600;"><i class="ph-fill ph-check-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>Everyone is on track!</div>`;
+                    reportHtml = `<div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #10b981; font-weight: 600;"><i class="ph-fill ph-check-circle" style="font-size: 2rem; display: block; margin-bottom: 0.5rem;"></i>Everyone is on track!</div>`;
                 }
 
                 actionReportContent.innerHTML = reportHtml;
