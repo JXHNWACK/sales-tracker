@@ -532,8 +532,8 @@
             <h2>KPI Target Calculator</h2>
             
             <div style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 0.4rem; flex-wrap: nowrap;">
-                <button id="roleAdvisorBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--primary-color); color: white; border: 1px solid var(--primary-color);">👤 Advisor</button>
-                <button id="roleManagerBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--box-bg); color: var(--text-muted); border: 1px solid var(--border-color);">👑 Manager</button>
+                <button id="roleAdvisorBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--primary-color); color: white; border: 1px solid var(--primary-color); display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-user"></i> Advisor</button>
+                <button id="roleManagerBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; font-weight: bold; cursor: pointer; font-size: 0.75rem; transition: all 0.2s; background-color: var(--box-bg); color: var(--text-muted); border: 1px solid var(--border-color); display: flex; align-items: center; gap: 0.25rem;"><i class="ph ph-briefcase"></i> Manager</button>
                 <button id="darkModeBtn" style="width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; border: 1px solid var(--border-color); font-weight: bold; color: var(--text-muted); background-color: var(--box-bg); cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; gap: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;"><i class="ph ph-moon"></i> Dark Mode</button>
                 <button id="openCustomizeBtn" style="display: none; width: auto; height: 28px; padding: 0.15rem 0.75rem; border-radius: 999px; border: 1px solid var(--border-color); font-weight: bold; color: var(--text-muted); background-color: var(--box-bg); cursor: pointer; font-size: 0.75rem; align-items: center; gap: 0.25rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;"><i class="ph ph-palette"></i> Customize</button>
             </div>
@@ -541,14 +541,14 @@
             <div class="input-group" style="max-width: 400px; margin: 1.5rem auto 0 auto; display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                 <img id="advisorImage" src="https://ui-avatars.com/api/?name=Lucy&background=e0e7ff&color=4f46e5&rounded=true" alt="Profile" style="width: 40px; height: 40px; border-radius: 50%; box-shadow: 0 0 0 2px var(--primary-color);">
                 <select id="advisorSelect" style="flex: 1; border-color: var(--primary-color); font-weight: bold; color: var(--primary-color); text-align: center; background-color: #e0e7ff; cursor: pointer; font-size: 1.1rem;">
-                    <option value="default" disabled selected>👋 Select Advisor...</option>
-                    <option value="advisor1">👤 Lucy</option>
-                    <option value="advisor2">👤 Luiza</option>
-                    <option value="advisor3">👤 Hamza</option>
-                    <option value="advisor4">👤 Jibraan</option>
-                    <option value="advisor5">👤 Pratiksha</option>
-                    <option value="advisor6">👤 Hayley</option>
-                    <option value="advisor7">👤 Amirah</option>
+                    <option value="default" disabled selected>Select Advisor...</option>
+                    <option value="advisor1">Lucy</option>
+                    <option value="advisor2">Luiza</option>
+                    <option value="advisor3">Hamza</option>
+                    <option value="advisor4">Jibraan</option>
+                    <option value="advisor5">Pratiksha</option>
+                    <option value="advisor6">Hayley</option>
+                    <option value="advisor7">Amirah</option>
                 </select>
                 <button id="saveBtn" style="background-color: #10b981; color: white; border: none; border-radius: 6px; padding: 0 1rem; height: 40px; cursor: pointer; font-weight: bold; font-size: 1rem; transition: background-color 0.2s; flex-shrink: 0;"><i class="ph ph-floppy-disk"></i> Save</button>
             </div>
@@ -2263,7 +2263,7 @@
                             ? `<span style="background: #10b981; color: white; padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold; box-shadow: 0 1px 2px rgba(16,185,129,0.3);">IN TODAY</span>` 
                             : `<span style="background: var(--border-color); color: var(--text-muted); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.65rem; font-weight: bold;">OFF</span>`;
 
-                        reportHtml += `<h4 style="margin: 0; color: var(--text-main); border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem;"><span>👤 ${adv.name}</span> ${statusBadge}</h4>`;
+                        reportHtml += `<h4 style="margin: 0; color: var(--text-main); border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem;"><span><i class="ph ph-user" style="color: var(--primary-color); margin-right: 0.25rem;"></i> ${adv.name}</span> ${statusBadge}</h4>`;
                         
                         let shiftText = isWorkingToday ? 'today' : 'next shift';
 
