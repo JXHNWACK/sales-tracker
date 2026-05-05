@@ -496,6 +496,46 @@
             color: var(--primary-color);
         }
         
+        /* Custom PIN Pad Styles */
+        .pin-btn {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            font-size: 1.5rem;
+            font-weight: bold;
+            height: 64px;
+            width: 64px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            touch-action: manipulation;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .pin-btn:active {
+            background-color: var(--primary-color);
+            color: white;
+            transform: scale(0.9);
+            box-shadow: none;
+        }
+        .pin-btn.action-btn {
+            background-color: transparent;
+            border: none;
+            box-shadow: none;
+            color: var(--text-muted);
+        }
+        .pin-btn.action-btn:active {
+            background-color: rgba(0,0,0,0.05);
+            color: var(--text-main);
+        }
+        body.dark-theme .pin-btn.action-btn:active {
+            background-color: rgba(255,255,255,0.1);
+        }
+        
         /* Mobile Compact Adjustments */
         @media (max-width: 600px) {
             body { padding: 8px; }
@@ -926,6 +966,36 @@
         </div>
     </div>
 
+    <!-- Manager PIN Modal -->
+    <div id="managerPinModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+        <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; width: 90%; max-width: 320px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0; color: var(--text-main); display: flex; align-items: center; gap: 0.4rem;"><i class="ph-fill ph-lock-key" style="color: var(--primary-color);"></i> Manager Access</h3>
+                <button id="closeManagerPin" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-muted);">&times;</button>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; text-align: center;">Enter PIN to unlock tools</p>
+            
+            <input type="password" id="managerPinInput" readonly placeholder="••••" maxlength="4" style="text-align: center; font-size: 2.5rem; letter-spacing: 0.75rem; font-weight: bold; margin-bottom: 1rem; height: 50px; border: none; background: transparent; box-shadow: none; padding: 0; color: var(--text-main); outline: none; width: 100%;">
+            
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.5rem;">
+                <button class="pin-btn num-btn" data-val="1">1</button>
+                <button class="pin-btn num-btn" data-val="2">2</button>
+                <button class="pin-btn num-btn" data-val="3">3</button>
+                <button class="pin-btn num-btn" data-val="4">4</button>
+                <button class="pin-btn num-btn" data-val="5">5</button>
+                <button class="pin-btn num-btn" data-val="6">6</button>
+                <button class="pin-btn num-btn" data-val="7">7</button>
+                <button class="pin-btn num-btn" data-val="8">8</button>
+                <button class="pin-btn num-btn" data-val="9">9</button>
+                <button class="pin-btn action-btn" id="pinClearBtn" style="font-size: 1rem;"><i class="ph ph-x"></i></button>
+                <button class="pin-btn num-btn" data-val="0">0</button>
+                <button class="pin-btn action-btn" id="pinBackspaceBtn" style="font-size: 1.5rem;"><i class="ph-fill ph-backspace"></i></button>
+            </div>
+            
+            <button id="submitManagerPinBtn" style="width: 100%; background-color: var(--primary-color); color: white; border: none; border-radius: 6px; padding: 0.75rem; font-weight: bold; font-size: 1rem; cursor: pointer; transition: background-color 0.2s;">Unlock</button>
+        </div>
+    </div>
+
     <!-- Bulk Edit Modal -->
     <div id="bulkEditModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
         <div style="background: var(--card-bg); padding: 1.5rem; border-radius: 12px; max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);">
@@ -1223,19 +1293,54 @@
                 }
             });
 
+            const managerPinModal = document.getElementById('managerPinModal');
+            const managerPinInput = document.getElementById('managerPinInput');
+            const submitManagerPinBtn = document.getElementById('submitManagerPinBtn');
+            const closeManagerPin = document.getElementById('closeManagerPin');
+
+            const pinNumBtns = document.querySelectorAll('.num-btn');
+            const pinClearBtn = document.getElementById('pinClearBtn');
+            const pinBackspaceBtn = document.getElementById('pinBackspaceBtn');
+
+            if (pinNumBtns) {
+                pinNumBtns.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        if (managerPinInput.value.length < 4) {
+                            managerPinInput.value += e.target.closest('.num-btn').getAttribute('data-val');
+                        }
+                        if (managerPinInput.value.length === 4) {
+                            verifyManagerPin(); // Auto-submit when 4 digits are entered!
+                        }
+                    });
+                });
+            }
+            if (pinClearBtn) pinClearBtn.addEventListener('click', () => managerPinInput.value = '');
+            if (pinBackspaceBtn) pinBackspaceBtn.addEventListener('click', () => managerPinInput.value = managerPinInput.value.slice(0, -1));
+
+            function verifyManagerPin() {
+                const pin = managerPinInput.value;
+                if (pin !== MANAGER_PIN) {
+                    showToast("Incorrect PIN.", "error");
+                    managerPinInput.value = '';
+                } else {
+                    showToast("Manager Mode Unlocked", "success");
+                    currentRole = 'manager';
+                    updateRoleButtons();
+                    applyRolePermissions();
+                    renderCalendar(); // Refresh calendar to lock/unlock clickable days
+                    managerPinModal.style.display = 'none';
+                }
+            }
+
+            if (submitManagerPinBtn) submitManagerPinBtn.addEventListener('click', verifyManagerPin);
+            if (managerPinInput) managerPinInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') verifyManagerPin(); });
+            if (closeManagerPin) closeManagerPin.addEventListener('click', () => managerPinModal.style.display = 'none');
+            if (managerPinModal) managerPinModal.addEventListener('click', (e) => { if(e.target === managerPinModal) managerPinModal.style.display = 'none'; });
+
             roleManagerBtn.addEventListener('click', () => {
                 if (currentRole !== 'manager') {
-                    const pin = prompt("Enter Manager PIN to unlock Target settings:");
-                    if (pin !== MANAGER_PIN) {
-                        showToast("Incorrect PIN.", "error");
-                        return;
-                    } else {
-                        showToast("Manager Mode Unlocked", "success");
-                        currentRole = 'manager';
-                        updateRoleButtons();
-                        applyRolePermissions();
-                        renderCalendar(); // Refresh calendar to lock/unlock clickable days
-                    }
+                    managerPinInput.value = ''; // Clear previous input
+                    managerPinModal.style.display = 'flex';
                 }
             });
 
