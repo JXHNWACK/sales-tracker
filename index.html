@@ -1484,8 +1484,9 @@
                     let isCurrentlyOnTrack = false;
                     let currentRunRateVal = 0;
 
-                    if (!isNaN(mtd) && passed > 0 && !isNaN(target) && target > 0 && !isNaN(daysInMonth) && daysInMonth > 0) {
-                        const projectedTotal = (mtd / passed) * daysInMonth;
+                    const totalShifts = passed + remaining;
+                    if (!isNaN(mtd) && passed > 0 && !isNaN(target) && target > 0 && totalShifts > 0) {
+                        const projectedTotal = (mtd / passed) * totalShifts;
                         const runRatePercent = (projectedTotal / target) * 100;
                         currentRunRateVal = runRatePercent;
                         newRrText = runRatePercent.toFixed(2) + '%';
@@ -1630,7 +1631,6 @@
                     const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
                     
                     const month = parseInt(advData.monthSelect || document.getElementById('monthSelect').value, 10);
-                    const daysInMonth = new Date(currentYear, month, 0).getDate();
                     const scheduledDays = (advData.schedules && advData.schedules[month.toString()]) ? advData.schedules[month.toString()] : [];
                     
                     let passed = 0;
@@ -1643,8 +1643,10 @@
                         if (dayDate < todayDate) passed++;
                     });
 
-                    if (mtd > 0 && passed > 0 && target > 0 && daysInMonth > 0) {
-                        const projectedTotal = (mtd / passed) * daysInMonth;
+                    const totalShifts = scheduledDays.length;
+
+                    if (mtd > 0 && passed > 0 && target > 0 && totalShifts > 0) {
+                        const projectedTotal = (mtd / passed) * totalShifts;
                         score = parseFloat(((projectedTotal / target) * 100).toFixed(2));
                     }
                     return { name: adv.name, score: score };
@@ -2180,14 +2182,15 @@
                         const mtd = parseFloat(advData[`mtd_${kpi}`]) || 0;
 
                         if (target > 0) {
+                            const totalShifts = scheduledDays.length;
                             // Calculate exactly how many they need by the end of their current shift to be 100% on track
-                            let needToday = Math.ceil((target * (passed + 1) / daysInMonth) - mtd);
+                            let needToday = totalShifts > 0 ? Math.ceil((target * (passed + 1) / totalShifts) - mtd) : 0;
                             needToday = Math.max(0, needToday);
 
                             if (mtd === 0) {
                                 zeroKpis.push({ name: kpi, needToday: needToday });
                             } else {
-                                const projectedTotal = passed > 0 ? (mtd / passed) * daysInMonth : 0;
+                                const projectedTotal = (passed > 0 && totalShifts > 0) ? (mtd / passed) * totalShifts : 0;
                                 const runRate = passed > 0 ? (projectedTotal / target) * 100 : 0;
                                 
                                 if (runRate < 100 || passed === 0) {
@@ -2206,6 +2209,8 @@
 
                         reportHtml += `<h4 style="margin: 0; color: var(--text-main); border-bottom: 1px solid var(--card-border); padding-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem;"><span>👤 ${adv.name}</span> ${statusBadge}</h4>`;
                         
+                        let shiftText = isWorkingToday ? 'today' : 'next shift';
+
                         if (zeroKpis.length > 0) {
                             reportHtml += `<div style="font-size: 0.75rem;">`;
                             reportHtml += `<span style="font-weight: bold; color: #ef4444; display: block; margin-bottom: 0.3rem;">🚨 Zero Sold:</span>`;
@@ -2213,7 +2218,7 @@
                             zeroKpis.forEach(zk => {
                                 reportHtml += `<div style="display: flex; justify-content: space-between; background: #fef2f2; padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid #fecaca;">
                                     <strong style="color: #dc2626;">${zk.name}</strong>
-                                    <span style="color: #dc2626; font-weight: bold;">Need ${zk.needToday} today</span>
+                                    <span style="color: #dc2626; font-weight: bold;">Min ${zk.needToday} ${shiftText}</span>
                                 </div>`;
                             });
                             reportHtml += `</div></div>`;
@@ -2226,7 +2231,7 @@
                             behindKpis.forEach(bk => {
                                 reportHtml += `<div style="display: flex; justify-content: space-between; background: var(--box-bg); padding: 0.25rem 0.5rem; border-radius: 4px; border: 1px solid var(--card-border); box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
                                     <strong style="color: var(--text-main);">${bk.name} <span style="color: var(--text-muted); font-weight: normal;">(${bk.rr}%)</span></strong>
-                                    <span style="color: var(--primary-color); font-weight: bold;">Need ${bk.needToday} today</span>
+                                    <span style="color: var(--primary-color); font-weight: bold;">Min ${bk.needToday} ${shiftText}</span>
                                 </div>`;
                             });
                             reportHtml += `</div></div>`;
