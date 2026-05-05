@@ -122,6 +122,15 @@
             font-size: 0.9rem;
             font-weight: 500;
         }
+        
+        /* Custom Scrollbar for a premium feel */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+        body.dark-theme ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); }
+        body.dark-theme ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+
         .toast.success { border-left-color: #10b981; }
         .toast.error { border-left-color: #ef4444; }
         .toast.warning { border-left-color: #f59e0b; }
@@ -336,7 +345,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
         }
         .btn-reset:hover {
             background-color: #fca5a5;
@@ -355,8 +363,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
-            margin-left: 0.5rem;
         }
         .btn-bulk:hover {
             background-color: #bfdbfe;
@@ -375,8 +381,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
-            margin-left: 0.5rem;
         }
         .btn-target:hover { background-color: #bbf7d0; }
         .btn-target:active { transform: scale(0.95); }
@@ -391,8 +395,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
-            margin-left: 0.5rem;
         }
         .btn-summary:hover { background-color: #e9d5ff; }
         .btn-summary:active { transform: scale(0.95); }
@@ -407,8 +409,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
-            margin-left: 0.5rem;
         }
         .btn-action:hover { background-color: #fed7aa; }
         .btn-action:active { transform: scale(0.95); }
@@ -423,8 +423,6 @@
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
-            margin-top: 0.75rem;
-            margin-left: 0.5rem;
         }
         .btn-deals:hover { background-color: #fbcfe8; }
         .btn-deals:active { transform: scale(0.95); }
@@ -443,7 +441,15 @@
             border-radius: 999px;
             width: 0%;
             transition: width 0.5s ease-out, background-color 0.3s ease;
+            background-image: linear-gradient(45deg, rgba(255,255,255,0.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0.15) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+            animation: progressStripes 1s linear infinite;
         }
+        @keyframes progressStripes {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        .progress-fill.overachieving { animation-duration: 0.4s; }
         
         .calendar-day {
             width: 34px;
@@ -596,12 +602,14 @@
             <div id="lastSavedDisplay" style="text-align: center; margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
                 Last Updated: <span id="lastSavedTimestamp">Never saved</span>
             </div>
-            <button id="resetBtn" class="btn-reset"><i class="ph ph-arrow-counter-clockwise"></i> Reset Current Advisor</button>
-            <button id="bulkEditBtn" class="btn-bulk" style="display: none;"><i class="ph ph-clipboard-text"></i> Bulk Edit MTD</button>
-            <button id="storeTargetsBtn" class="btn-target" style="display: none;"><i class="ph ph-target"></i> Store Targets</button>
-            <button id="teamSummaryBtn" class="btn-summary" style="display: none;"><i class="ph ph-camera"></i> Team Summary</button>
-            <button id="actionReportBtn" class="btn-action" style="display: none;"><i class="ph ph-warning-circle"></i> Action Report</button>
-            <button id="storeDealsBtn" class="btn-deals" style="display: none;"><i class="ph ph-tag"></i> Top Deals</button>
+            <div id="actionButtonsContainer" style="display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; margin-top: 1rem;">
+                <button id="resetBtn" class="btn-reset" style="display: none;"><i class="ph ph-arrow-counter-clockwise"></i> Reset Current Advisor</button>
+                <button id="bulkEditBtn" class="btn-bulk" style="display: none;"><i class="ph ph-clipboard-text"></i> Bulk Edit MTD</button>
+                <button id="storeTargetsBtn" class="btn-target" style="display: none;"><i class="ph ph-target"></i> Store Targets</button>
+                <button id="teamSummaryBtn" class="btn-summary" style="display: none;"><i class="ph ph-camera"></i> Team Summary</button>
+                <button id="actionReportBtn" class="btn-action" style="display: none;"><i class="ph ph-warning-circle"></i> Action Report</button>
+                <button id="storeDealsBtn" class="btn-deals" style="display: none;"><i class="ph ph-tag"></i> Top Deals</button>
+            </div>
         </div>
         
         <div id="welcomeMessage" style="text-align: center; padding: 3rem 1rem; color: var(--text-muted); font-size: 1.1rem; font-weight: 500;">
@@ -609,6 +617,12 @@
         </div>
         
         <div id="dashboardContent" style="display: none;">
+            <div id="motdDisplay" class="motd-display">
+                <div style="font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem;">
+                    <i class="ph-fill ph-megaphone"></i> Manager Announcement
+                </div>
+                <div id="motdText" style="font-size: 0.95rem; line-height: 1.5; white-space: pre-wrap;"></div>
+            </div>
             <div class="schedule-section" style="margin-bottom: 1.5rem; background-color: var(--input-bg); padding: 1rem; border-radius: 12px; border: 1px solid var(--border-color);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
                     <label id="toggleCalendarBtn" class="calendar-toggle-btn">
@@ -1305,6 +1319,7 @@
             if (pinNumBtns) {
                 pinNumBtns.forEach(btn => {
                     btn.addEventListener('click', (e) => {
+                        if (navigator.vibrate) navigator.vibrate(20);
                         if (managerPinInput.value.length < 4) {
                             managerPinInput.value += e.target.closest('.num-btn').getAttribute('data-val');
                         }
@@ -1314,8 +1329,14 @@
                     });
                 });
             }
-            if (pinClearBtn) pinClearBtn.addEventListener('click', () => managerPinInput.value = '');
-            if (pinBackspaceBtn) pinBackspaceBtn.addEventListener('click', () => managerPinInput.value = managerPinInput.value.slice(0, -1));
+        if (pinClearBtn) pinClearBtn.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(20);
+            managerPinInput.value = '';
+        });
+        if (pinBackspaceBtn) pinBackspaceBtn.addEventListener('click', () => {
+            if (navigator.vibrate) navigator.vibrate(20);
+            managerPinInput.value = managerPinInput.value.slice(0, -1);
+        });
 
             function verifyManagerPin() {
                 const pin = managerPinInput.value;
@@ -1674,6 +1695,12 @@
                         if (!isNaN(target) && target > 0 && !isNaN(mtd)) {
                             progressPercent = (mtd / target) * 100;
                             if (progressPercent > 100) isOverAchieving = true;
+                            if (progressPercent > 100) {
+                                isOverAchieving = true;
+                                progDisplay.classList.add('overachieving');
+                            } else {
+                                progDisplay.classList.remove('overachieving');
+                            }
                             // Cap visual width at 100% so it doesn't overflow the container
                             if (progressPercent > 100) progressPercent = 100;
                         }
